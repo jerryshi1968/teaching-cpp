@@ -297,7 +297,7 @@ export default function App() {
   return <div className="app-shell">
     <header className="topbar">
       <button className="icon-button mobile-menu" aria-label="打开项目列表" onClick={() => setSidebarOpen(!sidebarOpen)}><Menu size={20} /></button>
-      <a href="/teaching-cpp/" className="brand"><span className="brand-mark"><Braces size={24} /></span><span><strong>提高编程</strong><small>C++ 练习室</small></span></a>
+      <a href="/teaching-cpp/" className="brand"><span className="brand-mark"><Braces size={24} /></span><span><strong>C++ 创意编程乐园</strong></span></a>
       <nav aria-label="主导航"><button className={page === 'workspace' ? 'nav-active' : ''} onClick={() => setPage('workspace')}><Code2 size={16} />练习工作台</button>{isTeacher && <button className={page === 'classroom' ? 'nav-active' : ''} onClick={() => setPage('classroom')}><GraduationCap size={17} />我的课堂</button>}</nav>
       <div className="topbar-right"><a className="platform-link" href={config.commonDashboard} target="_blank" rel="noopener noreferrer">p5.js 平台<ExternalLink size={13} /></a><span className="avatar">{user.username.slice(0, 1)}</span>{config.mode === 'demo' ? <select className="account-select" aria-label="演示身份" value={demoUser} onChange={event => { const value = Number(event.target.value); storeLocal('cpp:demo-user', value); setTargetStudent(null); setFolderId(null); setDemoUser(value); }}><option value="1">林老师 · 演示</option><option value="2">小林同学 · 演示</option><option value="3">小陈同学 · 演示</option></select> : <span className="user-name">{user.username}<small>{isTeacher ? '教师' : '学生'}</small></span>}</div>
     </header>

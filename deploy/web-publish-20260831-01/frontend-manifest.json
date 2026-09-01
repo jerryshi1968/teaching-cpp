@@ -1,0 +1,25 @@
+{
+  "source": "unchanged-frontend-from-predeploy-20260830-01",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "ab0e2b65520873527e747b5da953f79365ebb2bde9678cbc15a74f192c4905bd",
+      "bytes": 730
+    },
+    {
+      "path": "assets/editor-Do0j6OfF.js",
+      "sha256": "ae12886af868b6baab2b8c468026843e786560500b69e57ff13f3a7613f8990a",
+      "bytes": 533408
+    },
+    {
+      "path": "assets/index-CFO81r6M.js",
+      "sha256": "f97631b74527c3b9a2cf87c16c571f1996353886bf0747570d3e9e418407ba0b",
+      "bytes": 177978
+    },
+    {
+      "path": "assets/index-DK110m_B.css",
+      "sha256": "e4dd408c0f4c18b460f2b2eb841315c39cc40880f4f98ebbb87ce520f6cc4cb3",
+      "bytes": 21526
+    }
+  ]
+}

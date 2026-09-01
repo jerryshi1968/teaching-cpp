@@ -1,0 +1,58 @@
+{
+  "release": "teaching-cpp-production-20260830-01",
+  "status": "prepared-not-executed",
+  "target": {
+    "database": "teaching_p5js",
+    "account": "dbadmin@%",
+    "backend": "/var/www/teaching-p5js-backend",
+    "process": "p5js-backend",
+    "port": 5080
+  },
+  "mysqlVerification": {
+    "source": "user-reported-server-output",
+    "date": "2026-08-30",
+    "database": "teachingcpp20260830test",
+    "version": "8.4.9",
+    "passed": 16,
+    "log": "/var/www/teaching-cpp-backend/logs/mysql-verification-E5B5he9F.log",
+    "archiveSha256": "b942d27b18658646a3f5db1447e6f76a1b0e115ebbacf69ab3e2ffe1548b035f",
+    "testDatabaseRetained": true,
+    "productionDatabaseModified": false
+  },
+  "p5jsAfterVerification": {
+    "source": "user-reported-server-output",
+    "healthHttpStatus": 200,
+    "pm2Status": "online",
+    "pm2RestartCount": 67
+  },
+  "localVerification": {
+    "platform": "Windows",
+    "node": "24.14.1",
+    "passed": 74,
+    "skippedOptionalMysql": 1,
+    "categoryModelChecks": 17,
+    "controllerBoundaryChecks": 22,
+    "publicationSafetyChecks": 13,
+    "originalApplicationChecks": 22,
+    "productionPublicationExecuted": false
+  },
+  "migration": {
+    "id": "001_cpp",
+    "sha256": "d4436515e0059ec67212c52ad5a1caefdeec954566ba746c36fe59959c496041"
+  },
+  "p5jsFilesToReplace": [
+    "models/projectModel.js",
+    "models/projectGroupModel.js",
+    "models/fileModel.js"
+  ],
+  "cppWritesEnabled": false,
+  "cppRunEnabled": false,
+  "apacheChanges": false,
+  "cppServiceStart": false,
+  "remainingChecks": [
+    "server-publication-and-p5js-browser-regression",
+    "shared-authentication-and-same-origin-student-content",
+    "rootless-podman-real-compiler-and-execution-isolation",
+    "classroom-load-test-later"
+  ]
+}

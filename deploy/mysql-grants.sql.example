@@ -1,0 +1,13 @@
+-- 由数据库管理员在确认数据库名和账号后执行；不是应用启动脚本。
+-- 替换教学数据库名称 teaching_shared；账号密码另行安全设置。
+-- cpp_app 不需要 ALTER、CREATE、DROP、FILE、SUPER 或 GRANT OPTION 权限。
+GRANT SELECT (id,username,role,class_code,tokens) ON teaching_shared.users TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT ON teaching_shared.classes TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.projects TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.project_groups TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.files TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.cpp_documents TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.cpp_revisions TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.cpp_runs TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,INSERT,UPDATE,DELETE ON teaching_shared.cpp_distributions TO 'cpp_app'@'127.0.0.1';
+GRANT SELECT,UPDATE ON teaching_shared.cpp_queue_guard TO 'cpp_app'@'127.0.0.1';

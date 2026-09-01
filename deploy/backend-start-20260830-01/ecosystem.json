@@ -1,0 +1,35 @@
+{
+  "apps": [{
+    "name": "teaching-cpp-backend",
+    "cwd": "/var/www/teaching-cpp-backend",
+    "script": "backend/src/server.mjs",
+    "interpreter": "/var/www/teaching-cpp-backend/tools/node/bin/node",
+    "uid": 995,
+    "gid": 992,
+    "exec_mode": "fork",
+    "instances": 1,
+    "watch": false,
+    "autorestart": true,
+    "min_uptime": 10000,
+    "max_restarts": 3,
+    "restart_delay": 3000,
+    "kill_timeout": 5000,
+    "node_args": ["--max-old-space-size=256"],
+    "max_memory_restart": "384M",
+    "out_file": "/var/www/teaching-cpp-backend/logs/backend-out.log",
+    "error_file": "/var/www/teaching-cpp-backend/logs/backend-error.log",
+    "merge_logs": true,
+    "time": true,
+    "vizion": false,
+    "pmx": false,
+    "automation": false,
+    "env": {
+      "HOME": "/var/www/teaching-cpp-backend/runtime",
+      "USER": "cpp-web",
+      "LOGNAME": "cpp-web",
+      "PATH": "/usr/local/bin:/usr/bin:/bin",
+      "NODE_ENV": "production",
+      "APP_MODE": "production"
+    }
+  }]
+}

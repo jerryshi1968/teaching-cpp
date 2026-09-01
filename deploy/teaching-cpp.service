@@ -1,0 +1,28 @@
+[Unit]
+Description=C++ teaching application API
+After=network.target
+
+[Service]
+Type=simple
+User=cpp-web
+Group=cpp-web
+WorkingDirectory=/opt/teaching-cpp
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/teaching-cpp/backend.env
+ExecStart=/usr/bin/node /opt/teaching-cpp/backend/src/server.mjs
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/teaching-cpp
+RestrictSUIDSGID=true
+LimitNOFILE=4096
+MemoryMax=384M
+TasksMax=128
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

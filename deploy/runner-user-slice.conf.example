@@ -1,0 +1,9 @@
+# 放入 /etc/systemd/system/user-<cpp-runner实际UID>.slice.d/limits.conf。
+# 不要写到 user.slice，以免影响网站、数据库和其他用户。
+[Slice]
+MemoryAccounting=yes
+CPUAccounting=yes
+TasksAccounting=yes
+MemoryMax=1G
+CPUQuota=100%
+TasksMax=256

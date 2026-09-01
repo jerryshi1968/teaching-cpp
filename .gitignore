@@ -1,0 +1,44 @@
+node_modules/
+.npm-cache/
+frontend/dist/
+.env
+.env.*
+!.env.example
+!.env.*.example
+storage/
+runner-data/
+*.log
+coverage/
+.DS_Store
+
+# Local deployment artifacts and downloaded server copies
+downloads/
+releases/
+server-review/
+backups/
+logs/
+runtime/
+tools/
+
+# Local indexes, editors and operating-system files
+.codegraph/
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+.download.lock
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# Additional test reports
+.nyc_output/
+test-results/
+playwright-report/

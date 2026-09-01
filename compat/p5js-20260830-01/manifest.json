@@ -1,0 +1,40 @@
+{
+  "status": "draft-not-for-deployment",
+  "requiresMigration": "001_cpp",
+  "pendingServerReview": [],
+  "serverSyncVerification": {
+    "date": "2026-08-30",
+    "source": "user-reported-command-output",
+    "files": {
+      "app.js": "52c7faec2a641a0f21e8a16b754757f01f65d5902f5f0b7ef4a4b28633d51203",
+      "services/exampleService.js": "9f1e7d2f3bd401072cc06a7eb50727ecfd00ff7811ded2ce9f4a16b52fd3bb70"
+    },
+    "port": 5080,
+    "healthHttpStatus": 200,
+    "pm2Status": "online",
+    "pm2RestartCount": 67
+  },
+  "files": [
+    {
+      "path": "models/projectModel.js",
+      "originalSha256": "7a5488c268596cc42d9b141466ec38efc975a31df8519950472d0ddc0ee514a0",
+      "normalizedOriginalSha256": "7a5488c268596cc42d9b141466ec38efc975a31df8519950472d0ddc0ee514a0",
+      "patchedSha256": "1473e795048a1cc2825fbc8d927b8857527f7790944235a21133f5e3ee6e260b",
+      "normalizedPatchedSha256": "1473e795048a1cc2825fbc8d927b8857527f7790944235a21133f5e3ee6e260b"
+    },
+    {
+      "path": "models/projectGroupModel.js",
+      "originalSha256": "821272aa417252d6447cb4db34d0f34b6c6009bdc29e8333458273460f3ac3c5",
+      "normalizedOriginalSha256": "821272aa417252d6447cb4db34d0f34b6c6009bdc29e8333458273460f3ac3c5",
+      "patchedSha256": "4b40c0439349079b43e1b20b0b5b1d6fad0063eead8431791e5fff626b44d81d",
+      "normalizedPatchedSha256": "4b40c0439349079b43e1b20b0b5b1d6fad0063eead8431791e5fff626b44d81d"
+    },
+    {
+      "path": "models/fileModel.js",
+      "originalSha256": "54438a13f6163558eec024e34acb45dd31d4e923be075bef3c6975491e80b729",
+      "normalizedOriginalSha256": "54438a13f6163558eec024e34acb45dd31d4e923be075bef3c6975491e80b729",
+      "patchedSha256": "1decdad8f8428ba718c3ef1b3cb1d56cce009a606b9a73e7260d8271a29a6647",
+      "normalizedPatchedSha256": "1decdad8f8428ba718c3ef1b3cb1d56cce009a606b9a73e7260d8271a29a6647"
+    }
+  ]
+}

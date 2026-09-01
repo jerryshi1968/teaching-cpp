@@ -1,0 +1,24 @@
+# 此文件是 cpp-runner 普通用户的 systemd --user 单元，不能作为 root 系统单元直接启动。
+[Unit]
+Description=Rootless C++ sandbox runner
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/teaching-cpp
+EnvironmentFile=%h/.config/teaching-cpp/runner.env
+ExecStart=/usr/bin/node /opt/teaching-cpp/runner/src/server.mjs
+Restart=on-failure
+RestartSec=10
+UMask=0077
+Delegate=yes
+KillMode=mixed
+TimeoutStopSec=90
+LimitNOFILE=4096
+TasksMax=256
+# rootless Podman 的 newuidmap/newgidmap 需要创建用户命名空间。
+# 不要为本单元添加 NoNewPrivileges、PrivateUsers 或阻断用户命名空间的限制。
+# 容器本身由代码逐项限制；总 CPU/内存限制应同时施加到 cpp-runner 用户 slice。
+
+[Install]
+WantedBy=default.target

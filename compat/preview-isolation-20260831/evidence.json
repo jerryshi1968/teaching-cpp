@@ -1,0 +1,90 @@
+{
+  "date": "2026-08-31",
+  "status": "local-comparison-complete-production-unchanged",
+  "productionSampleReportedByUser": {
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "contentSecurityPolicy": null,
+    "scope": "one-existing-p5js-project-index"
+  },
+  "publicDnsObservation": {
+    "nameservers": [
+      "dns27.hichina.com",
+      "dns28.hichina.com"
+    ],
+    "proposedHostname": "preview.tigao123.com",
+    "proposedHostnameResult": "NXDOMAIN through local resolver; not proof of provider configuration"
+  },
+  "browser": "Codex In-app Browser",
+  "origins": {
+    "platform": "http://127.0.0.1:61375",
+    "preview": "http://127.0.0.1:61376"
+  },
+  "library": {
+    "name": "p5-1.11.13.min.js",
+    "sha256": "e9df7d05fd7c3ff028fc09a312a43101241f23c43143b387bf89d96b2e4e0849"
+  },
+  "checks": {
+    "summary": "4/4 组结果符合预期",
+    "cases": [
+      {
+        "kind": "fixture-result",
+        "mode": "legacy",
+        "topLevel": false,
+        "parentReadable": true,
+        "storageAvailable": true,
+        "canvasDrawn": true,
+        "jsonLoaded": true,
+        "imageLoaded": true
+      },
+      {
+        "kind": "fixture-result",
+        "mode": "sandbox",
+        "topLevel": false,
+        "parentReadable": false,
+        "storageAvailable": false,
+        "canvasDrawn": true,
+        "jsonLoaded": false,
+        "imageLoaded": false
+      },
+      {
+        "kind": "fixture-result",
+        "mode": "sandbox-cors",
+        "topLevel": false,
+        "parentReadable": false,
+        "storageAvailable": false,
+        "canvasDrawn": true,
+        "jsonLoaded": true,
+        "imageLoaded": true
+      },
+      {
+        "kind": "fixture-result",
+        "mode": "separate-origin",
+        "topLevel": false,
+        "parentReadable": false,
+        "storageAvailable": true,
+        "canvasDrawn": true,
+        "jsonLoaded": true,
+        "imageLoaded": true
+      }
+    ],
+    "direct": {
+      "canvasDrawn": true,
+      "imageLoaded": true,
+      "jsonLoaded": true,
+      "kind": "fixture-result",
+      "mode": "sandbox-cors",
+      "parentReadable": false,
+      "storageAvailable": false,
+      "topLevel": true
+    }
+  },
+  "limits": [
+    "Synthetic DOM marker only; no real account, token, cookie, storage values, database or production website used.",
+    "Storage API availability only; no storage keys read, enumerated, written or deleted.",
+    "Two localhost ports model different origins; no production DNS, HTTPS, Apache or certificate changes tested.",
+    "No full existing-work regression, sound playback, camera access, old browser coverage or coordinate bridge implementation.",
+    "Different preview origin protects the platform origin; it does not isolate students from each other within the shared preview origin.",
+    "Strict sandbox direct-page test confirms storage API denied; its topLevel parentReadable false is not an opener isolation test."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@teaching-cpp/runner",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/server.mjs" },
+  "dependencies": { "dotenv": "^17.2.0", "express": "^5.1.0" }
+}

@@ -1,0 +1,7 @@
+# 构建时必须提供来自官方 GCC 镜像的、带摘要的已核验基础镜像。
+ARG GCC_BASE
+FROM ${GCC_BASE}
+RUN test -x /usr/local/bin/g++ && mkdir -p /work && chmod 755 /work
+WORKDIR /work
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+CMD ["/usr/local/bin/g++", "--version"]

@@ -1,0 +1,365 @@
+{
+  "source": "docker.io/library/gcc:14.4.0",
+  "officialSource": "https://raw.githubusercontent.com/docker-library/official-images/master/library/gcc",
+  "indexDigest": "sha256:88134abee5c979390be4fedf9af2635e324004f0f3c1266a8c924c7a08e69500",
+  "amd64Digest": "sha256:6cc8e40ae136aea7c6b064124d2c09417e4649aacf22e6785ea03bd37185064c",
+  "configDigest": "sha256:6b4bd930afb1272016c64651ed6192f519f666edf9255213ad09c5cbdd657723",
+  "compressedLayerBytes": 540483496,
+  "index": {
+    "manifests": [
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "amd64",
+          "org.opencontainers.image.base.digest": "sha256:5538d976c7bd14a8c1c610d6ee80db0b464b9ae6750af3ce67351678ec304a1b",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T05:46:59Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:6cc8e40ae136aea7c6b064124d2c09417e4649aacf22e6785ea03bd37185064c",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "size": 2488
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "amd64",
+          "vnd.docker.reference.digest": "sha256:6cc8e40ae136aea7c6b064124d2c09417e4649aacf22e6785ea03bd37185064c",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:962cce76a2a4aab97d1893ee4da3d528ad9e7de538232b6bbf33f5fa406f18d7",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm32v5",
+          "org.opencontainers.image.base.digest": "sha256:40484ce8e8b2bb863d283813789b2c4c2b35f1488630f61aea4ed4b04f975ad4",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T09:09:13Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:73c5c7264af5781b27281d88a87de358d33e1e1e834ef1297490537493771c5b",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "arm",
+          "os": "linux",
+          "variant": "v5"
+        },
+        "size": 2489
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm32v5",
+          "vnd.docker.reference.digest": "sha256:73c5c7264af5781b27281d88a87de358d33e1e1e834ef1297490537493771c5b",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:551ae006c5f88a1c2d18af830ba77c19f1a644976007a7866fcbb5fa0cdff4a5",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm32v7",
+          "org.opencontainers.image.base.digest": "sha256:c459bf7e62a16e3b121977aa6f01b80a784caf1db76bd76b84bb41589f6a5d37",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T05:47:24Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:713175938d3bc7f84270f14dbddd42d0bb1d3bd84088af5f7ad9c1c405f43b3f",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "arm",
+          "os": "linux",
+          "variant": "v7"
+        },
+        "size": 2490
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm32v7",
+          "vnd.docker.reference.digest": "sha256:713175938d3bc7f84270f14dbddd42d0bb1d3bd84088af5f7ad9c1c405f43b3f",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:2ea7e2aca08dbb2776e62fef50d0adc1d0d1cba0e7d5b6efd451099b74dca758",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm64v8",
+          "org.opencontainers.image.base.digest": "sha256:0e9140c9c9726c1f911bb3e7d3910284519d3aa85dc91b0316ef9c0d27c3b66d",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T04:43:20Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:02da17547690ca733710fbf863346e72bc0bdb75598202a2c7ba7011580741ed",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux",
+          "variant": "v8"
+        },
+        "size": 2490
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm64v8",
+          "vnd.docker.reference.digest": "sha256:02da17547690ca733710fbf863346e72bc0bdb75598202a2c7ba7011580741ed",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:c83c8d6b010b7a629bbfaa0e97ad0696560f7e23edb09fca4b691fa53debc59e",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "ppc64le",
+          "org.opencontainers.image.base.digest": "sha256:d69e69c048e31767b1c3c39a4216ab2b6aa119d4118df002864eccae506ed251",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T21:39:29Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:0423d52457c0399a87ddf19bcb801de98d543991c0445efdb97db5c1183f548a",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "ppc64le",
+          "os": "linux"
+        },
+        "size": 2490
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "ppc64le",
+          "vnd.docker.reference.digest": "sha256:0423d52457c0399a87ddf19bcb801de98d543991c0445efdb97db5c1183f548a",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:278ba91567f5a7435fc70cb122586996e5d3189789fdc49c36138c3be06d5720",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "s390x",
+          "org.opencontainers.image.base.digest": "sha256:02dbe191d6a77e87cf1b5741a004fd19101d5c8d49117d8a140fba59f4448f26",
+          "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+          "org.opencontainers.image.created": "2026-08-25T04:11:35Z",
+          "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+          "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+          "org.opencontainers.image.version": "14.4.0"
+        },
+        "digest": "sha256:4e373a63487a9dbca6b9d7acc0a599def92b0c6b8447da3f806605ebf6a3b9d3",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "s390x",
+          "os": "linux"
+        },
+        "size": 2488
+      },
+      {
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "s390x",
+          "vnd.docker.reference.digest": "sha256:4e373a63487a9dbca6b9d7acc0a599def92b0c6b8447da3f806605ebf6a3b9d3",
+          "vnd.docker.reference.type": "attestation-manifest"
+        },
+        "digest": "sha256:37e81c660b43679a2b6bf5abcaccf2d24e7c82aa3aada7f5e065d9ea697601ce",
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        },
+        "size": 842
+      }
+    ],
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "schemaVersion": 2
+  },
+  "manifest": {
+    "schemaVersion": 2,
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "config": {
+      "mediaType": "application/vnd.oci.image.config.v1+json",
+      "digest": "sha256:6b4bd930afb1272016c64651ed6192f519f666edf9255213ad09c5cbdd657723",
+      "size": 7420
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:27ee9a8250487842a26b1ffa1215982ba9ae27010bce1997d52f9f8628578d17",
+        "size": 49337828
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:00f78834a2fef03250be89a7741ff39d0e6bbd860298ea129a84ce5eadda1f6d",
+        "size": 25639590
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:cbc19164244e861d91ebd80a17e2c78c5be43a8059a32ab6fc459a92002b22f2",
+        "size": 67800074
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:44fed46b68cf907ddf6afb6bc4211842f016a0876b02fc27912582de4c2fed3b",
+        "size": 236338551
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:5c41269d871b008ea663ae43b2e808654e5a39a6a088d6fff63a95a0a81af547",
+        "size": 4592275
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:cb7fe6e5a67e1a04043bc199c345a6015e093f085be9cce5cb052b93e5b1c0ba",
+        "size": 156762528
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:026de8951a248db15909386d80dbd8ed4e51e85c26446c09318d8ed99a794233",
+        "size": 10646
+      },
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+        "digest": "sha256:d5fca3cf006e1ce9ae6421f7384de8cb02ee174acc44ad22a35eb53ca5946157",
+        "size": 2004
+      }
+    ],
+    "annotations": {
+      "com.docker.official-images.bashbrew.arch": "amd64",
+      "org.opencontainers.image.base.digest": "sha256:5538d976c7bd14a8c1c610d6ee80db0b464b9ae6750af3ce67351678ec304a1b",
+      "org.opencontainers.image.base.name": "buildpack-deps:trixie",
+      "org.opencontainers.image.created": "2026-08-25T05:46:59Z",
+      "org.opencontainers.image.revision": "d0fb67beca5c8248b88c7e5271ab34b4fdb279a0",
+      "org.opencontainers.image.source": "https://github.com/docker-library/gcc.git#d0fb67beca5c8248b88c7e5271ab34b4fdb279a0:14",
+      "org.opencontainers.image.url": "https://hub.docker.com/_/gcc",
+      "org.opencontainers.image.version": "14.4.0"
+    }
+  },
+  "config": {
+    "architecture": "amd64",
+    "config": {
+      "Env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "GPG_KEYS=B215C1633BCA0477615F1B35A5B3A004745C015A \tB3C42148A44E6983B3E4CC0793FA9B1AB75C61B8 \t90AA470469D3965A87A5DCB494D03953902C9419 \t80F98B2E0DAB6C8281BDF541A7C8C3B2F71EDF1C \t7F74F97C103468EE5D750B583AB00996FC26A641 \t33C235A34C46AA3FFB293709A328C3A2C3C45C06 \tD3A93CAD751C2AF4F8C7AD516C35B99309B5FA62",
+        "GCC_MIRRORS=https://ftpmirror.gnu.org/gcc \t\thttps://mirrors.kernel.org/gnu/gcc \t\thttps://bigsearcher.com/mirrors/gcc/releases \t\thttp://www.netgull.com/gcc/releases \t\thttps://ftpmirror.gnu.org/gcc \t\thttps://sourceware.org/pub/gcc/releases \t\tftp://ftp.gnu.org/gnu/gcc",
+        "GCC_VERSION=14.4.0"
+      ],
+      "Cmd": [
+        "bash"
+      ]
+    },
+    "created": "2026-08-25T06:33:39.074609973Z",
+    "history": [
+      {
+        "created": "2026-08-24T00:00:00Z",
+        "created_by": "# debian.sh --arch 'amd64' out/ 'trixie' '@1787529600'",
+        "comment": "debuerreotype 0.17"
+      },
+      {
+        "created": "2026-08-25T00:50:59.217954945Z",
+        "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tca-certificates \t\tcurl \t\tgnupg \t\tnetbase \t\tsq \t\twget \t; \tapt-get dist-clean # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T01:38:30.29690952Z",
+        "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tgit \t\tmercurial \t\topenssh-client \t\tsubversion \t\t\t\tprocps \t; \tapt-get dist-clean # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T02:19:04.261328968Z",
+        "created_by": "RUN /bin/sh -c set -ex; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tautoconf \t\tautomake \t\tbzip2 \t\tdefault-libmysqlclient-dev \t\tdpkg-dev \t\tfile \t\tg++ \t\tgcc \t\timagemagick \t\tlibbz2-dev \t\tlibc6-dev \t\tlibcurl4-openssl-dev \t\tlibdb-dev \t\tlibevent-dev \t\tlibffi-dev \t\tlibgdbm-dev \t\tlibglib2.0-dev \t\tlibgmp-dev \t\tlibjpeg-dev \t\tlibkrb5-dev \t\tliblzma-dev \t\tlibmagickcore-dev \t\tlibmagickwand-dev \t\tlibmaxminddb-dev \t\tlibncurses5-dev \t\tlibncursesw5-dev \t\tlibpng-dev \t\tlibpq-dev \t\tlibreadline-dev \t\tlibsqlite3-dev \t\tlibssl-dev \t\tlibtool \t\tlibwebp-dev \t\tlibxml2-dev \t\tlibxslt-dev \t\tlibyaml-dev \t\tmake \t\tpatch \t\tunzip \t\txz-utils \t\tzlib1g-dev \t; \tapt-get dist-clean # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T05:47:42.697765045Z",
+        "created_by": "RUN /bin/sh -c set -eux; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tabigail-tools \t; \trm -rf /var/lib/apt/lists/* # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T06:33:38.764367452Z",
+        "created_by": "ENV GPG_KEYS=B215C1633BCA0477615F1B35A5B3A004745C015A \tB3C42148A44E6983B3E4CC0793FA9B1AB75C61B8 \t90AA470469D3965A87A5DCB494D03953902C9419 \t80F98B2E0DAB6C8281BDF541A7C8C3B2F71EDF1C \t7F74F97C103468EE5D750B583AB00996FC26A641 \t33C235A34C46AA3FFB293709A328C3A2C3C45C06 \tD3A93CAD751C2AF4F8C7AD516C35B99309B5FA62",
+        "comment": "buildkit.dockerfile.v0",
+        "empty_layer": true
+      },
+      {
+        "created": "2026-08-25T06:33:38.764367452Z",
+        "created_by": "ENV GCC_MIRRORS=https://ftpmirror.gnu.org/gcc \t\thttps://mirrors.kernel.org/gnu/gcc \t\thttps://bigsearcher.com/mirrors/gcc/releases \t\thttp://www.netgull.com/gcc/releases \t\thttps://ftpmirror.gnu.org/gcc \t\thttps://sourceware.org/pub/gcc/releases \t\tftp://ftp.gnu.org/gnu/gcc",
+        "comment": "buildkit.dockerfile.v0",
+        "empty_layer": true
+      },
+      {
+        "created": "2026-08-25T06:33:38.764367452Z",
+        "created_by": "ENV GCC_VERSION=14.4.0",
+        "comment": "buildkit.dockerfile.v0",
+        "empty_layer": true
+      },
+      {
+        "created": "2026-08-25T06:33:38.764367452Z",
+        "created_by": "RUN /bin/sh -c set -ex; \t\tsavedAptMark=\"$(apt-mark showmanual)\"; \tapt-get update; \tapt-get install -y --no-install-recommends \t\tdpkg-dev \t\tflex \t\tgnupg \t; \trm -r /var/lib/apt/lists/*; \t\t_fetch() { \t\tlocal fetch=\"$1\"; shift; \t\tlocal file=\"$1\"; shift; \t\tfor mirror in $GCC_MIRRORS; do \t\t\tif curl -fL \"$mirror/$fetch\" -o \"$file\"; then \t\t\t\treturn 0; \t\t\tfi; \t\tdone; \t\techo >&2 \"error: failed to download '$fetch' from several mirrors\"; \t\treturn 1; \t}; \t\t_fetch \"gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz.sig\" 'gcc.tar.xz.sig'; \t_fetch \"gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz\" 'gcc.tar.xz'; \texport GNUPGHOME=\"$(mktemp -d)\"; \tfor key in $GPG_KEYS; do \t\tgpg --batch --keyserver keyserver.ubuntu.com --recv-keys \"$key\"; \tdone; \tgpg --batch --verify gcc.tar.xz.sig gcc.tar.xz; \tgpgconf --kill all; \trm -rf \"$GNUPGHOME\"; \tmkdir -p /usr/src/gcc; \ttar -xf gcc.tar.xz -C /usr/src/gcc --strip-components=1; \trm gcc.tar.xz*; \t\tcd /usr/src/gcc; \t\t./contrib/download_prerequisites; \t{ rm *.tar.* || true; }; \t\tfor f in config.guess config.sub; do \t\twget -O \"$f\" \"https://git.savannah.gnu.org/cgit/config.git/plain/$f?id=7d3d27baf8107b630586c962c057e22149653deb\"; \t\tfind -mindepth 2 -name \"$f\" -exec cp -v \"$f\" '{}' ';'; \tdone; \t\tdir=\"$(mktemp -d)\"; \tcd \"$dir\"; \t\textraConfigureArgs=''; \tdpkgArch=\"$(dpkg --print-architecture)\"; \tcase \"$dpkgArch\" in \t\tarmel) \t\t\textraConfigureArgs=\"$extraConfigureArgs --with-arch=armv5te --with-float=soft\" \t\t\t;; \t\tarmhf) \t\t\textraConfigureArgs=\"$extraConfigureArgs --with-arch=armv7-a+fp --with-float=hard --with-mode=thumb\" \t\t\t;; \t\t\t\ti386) \t\t\textraConfigureArgs=\"$extraConfigureArgs --with-arch-32=i686\"; \t\t\t;; \tesac; \t\tgnuArch=\"$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)\"; \t/usr/src/gcc/configure \t\t--build=\"$gnuArch\" \t\t--disable-multilib \t\t--enable-languages=c,c++,fortran,go \t\t$extraConfigureArgs \t; \tmake -j \"$(nproc)\"; \tmake install-strip; \t\tcd ..; \t\trm -rf \"$dir\" /usr/src/gcc; \t\tapt-mark auto '.*' > /dev/null; \t[ -z \"$savedAptMark\" ] || apt-mark manual $savedAptMark; \tapt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T06:33:38.92777469Z",
+        "created_by": "RUN /bin/sh -c set -ex; \t{ echo '/usr/local/lib64'; echo '/usr/local/lib'; } > /etc/ld.so.conf.d/000-local-lib.conf; \tldconfig -v; \tdeb=\"$(readlink -ve /usr/lib/*/libstdc++.so* | head -1)\"; \tgcc=\"$(readlink -ve /usr/local/lib*/libstdc++.so | head -1)\"; \tLD_PRELOAD=\"$deb\" abidiff --no-added-syms \"$deb\" \"$gcc\" # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      },
+      {
+        "created": "2026-08-25T06:33:39.074609973Z",
+        "created_by": "RUN /bin/sh -c set -ex; \tdpkg-divert --divert /usr/bin/gcc.orig --rename /usr/bin/gcc; \tdpkg-divert --divert /usr/bin/g++.orig --rename /usr/bin/g++; \tdpkg-divert --divert /usr/bin/gfortran.orig --rename /usr/bin/gfortran; \tupdate-alternatives --install /usr/bin/cc cc /usr/local/bin/gcc 999 # buildkit",
+        "comment": "buildkit.dockerfile.v0"
+      }
+    ],
+    "os": "linux",
+    "rootfs": {
+      "type": "layers",
+      "diff_ids": [
+        "sha256:31631a95db7cd650d1c826f269b9e93b57d9f418128bf7c5499b4403be4d44d0",
+        "sha256:7c367ef8c1ea18872336c6bc0672b2ff7fee5dc56c055ce54e62f2ccfde4f847",
+        "sha256:144ea2bdbdf828c7c9867865b4eeffc5ec977e8e686cdfd1e240a890e9d4cf8e",
+        "sha256:758a60093d45fcab0f50466c34253fcdaea5dbb0bacd6495bda7d4e8d90e61d6",
+        "sha256:929ba9db121af4494e9aabd0210a639835c079ec331141d8e82773ccfa867cb2",
+        "sha256:f3ce35d2fbd9665661d2bcb9d05f8c2037ffa0d31a09df9750ae4d1fe028abf1",
+        "sha256:7f20064d525e026bf708bcf4eec89b287cd0f3a16a033538be6ba8f10a9764f2",
+        "sha256:ade0ac3a5978731ef88c336b6c1e2178eacef47a7148ff1702522aba19f1268d"
+      ]
+    }
+  }
+}

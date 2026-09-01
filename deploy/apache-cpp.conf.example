@@ -1,0 +1,26 @@
+# 适用于 Apache 2.4；先核对现有 tigao123.com HTTPS VirtualHost，再合并。
+# 这不是完整 VirtualHost，不能直接覆盖原 httpd 配置。
+# 以下 ProxyPass 需在同一配置层较宽的 /api/ 或 / 代理之前。
+# 如果原配置使用 Location/Rewrite 代理，须先核对上下文再调整。
+# 保留所有原有规则、证书和 p5.js 配置，不开放正向代理。
+ProxyPass "/api/cpp/" "http://127.0.0.1:5180/api/cpp/" connectiontimeout=5 timeout=30
+ProxyPassReverse "/api/cpp/" "http://127.0.0.1:5180/api/cpp/"
+
+# 本段假定已核实该站 DocumentRoot 为 /var/www/html；否则需要单独的 Alias。
+# 仅发布 frontend/dist 的内容，不发布整个项目目录。
+<Directory "/var/www/html/teaching-cpp">
+    Options -Indexes
+    AllowOverride None
+    Require all granted
+    DirectoryIndex index.html
+    FallbackResource /teaching-cpp/index.html
+</Directory>
+
+# 后端配置、源码、备份、日志和执行工作目录不允许作为网站资源提供。
+<Directory "/var/www/teaching-cpp-backend">
+    Require all denied
+</Directory>
+<Directory "/var/www/teaching-cpp-runner">
+    Require all denied
+</Directory>
+# 禁止为 5280 端口或 /jobs 添加公网代理。

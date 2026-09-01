@@ -1,0 +1,24 @@
+# 仅把这些 location 合并到现有 tigao123.com HTTPS server 中。
+# 不覆盖原 server、证书、/api/ 或 /teaching-p5js/ 配置。
+location = /teaching-cpp {
+    return 301 /teaching-cpp/;
+}
+location ^~ /teaching-cpp/ {
+    proxy_pass http://127.0.0.1:5100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $remote_addr;
+}
+location = /api/cpp {
+    return 404;
+}
+location ^~ /api/cpp/ {
+    proxy_pass http://127.0.0.1:5100;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    client_max_body_size 512k;
+    proxy_read_timeout 30s;
+    proxy_cache off;
+}
+# 严禁将 5200 或任何 /jobs 路由反向代理到公网。

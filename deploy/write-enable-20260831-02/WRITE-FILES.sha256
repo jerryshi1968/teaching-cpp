@@ -1,0 +1,4 @@
+e120a6612329f0ac5db9d86e04af5c72b7f6440ca6ec07bdc3b03f1d34b7498e  deploy/write-enable-20260831-02/README.md
+97e91a2447c8832e83f3f8e1c039d54fe25211f4f0a13454f99b7567adf3df13  deploy/write-enable-20260831-02/check-db.mjs
+0584b57f853d8630bae4be8a6445cbae0f48aaf126b0654d1e904be4165d540c  deploy/write-enable-20260831-02/enable.mjs
+bfb128f42064d82c458dabaa8bed2f65406be2b247f9c7731a8b6172e089aca9  deploy/write-enable-20260831-02/guard.mjs

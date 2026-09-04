@@ -75,3 +75,8 @@ test('适配器原样传播包含 status、code 和 message 的 API 错误', asy
   const adapter = createCppProjectOrganizerAdapter({ request: async () => { throw apiError; }, openProject: () => {} });
   await assert.rejects(adapter.loadDirectory({ ownerId: null, parentId: null }), error => error === apiError && error.status === 400 && error.code === 'INVALID_BEFORE' && error.message === '目标位置无效');
 });
+
+test('适配器在宿主关闭写入时向共享界面公开只读状态', async () => {
+  const adapter = createCppProjectOrganizerAdapter({ request: async () => ({ ...workspace, readOnly: false }), openProject: () => {}, writable: false });
+  assert.equal((await adapter.loadDirectory()).readOnly, true);
+});

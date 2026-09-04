@@ -81,7 +81,7 @@ function resource(kind) {
   throw new ProjectOrganizerAdapterError('INVALID_KIND', '作品类型必须是 project 或 group');
 }
 
-export function createCppProjectOrganizerAdapter({ request = api, openProject } = {}) {
+export function createCppProjectOrganizerAdapter({ request = api, openProject, writable = true } = {}) {
   let workspaceCache = null;
   const ownerKey = ownerId => ownerId == null ? null : String(ownerId);
   const loadWorkspace = async ownerId => {
@@ -93,7 +93,8 @@ export function createCppProjectOrganizerAdapter({ request = api, openProject } 
   const invalidate = () => { workspaceCache = null; };
   return {
     async loadDirectory({ ownerId = null, parentId = null } = {}) {
-      return buildDirectoryResult(await loadWorkspace(ownerId), parentId);
+      const directory = buildDirectoryResult(await loadWorkspace(ownerId), parentId);
+      return writable ? directory : { ...directory, readOnly: true };
     },
     async loadAllGroups({ ownerId = null } = {}) {
       const key = ownerKey(ownerId);

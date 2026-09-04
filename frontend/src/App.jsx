@@ -1,14 +1,23 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BookOpen, Braces, ChevronDown, ChevronRight, Code2, Copy, Download, ExternalLink, FileCode2, Folder, FolderPlus, GraduationCap, LogIn, Menu, MoreHorizontal, Play, Plus, RefreshCw, Save, Search, Settings2, Sparkles, Square, Trash2, Users, X, Check, AlertTriangle, Clock3, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Braces, ChevronDown, ChevronRight, Code2, Copy, Download, ExternalLink, FileCode2, Folder, FolderPlus, GraduationCap, LogIn, Menu, MoreHorizontal, Play, RefreshCw, Save, Settings2, Sparkles, Square, Trash2, Users, X, Check, AlertTriangle, Clock3, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { ProjectOrganizer } from '@tigao/organizer-react';
 import { ACTIVE_STATES, STATE_LABELS } from '../../shared/contracts.mjs';
 import { api, configureApi, downloadCode, readLocal, storeLocal } from './api.mjs';
 import CodeEditor from './CodeEditor.jsx';
 import Modal from './Modal.jsx';
+import { createLatestRequestCommitter } from './latest-request.mjs';
+import { createCppProjectOrganizerAdapter } from './project-organizer-adapter.mjs';
 
 const emptyWorkspace = { groups: [], projects: [], owner: null, readOnly: false };
 const sourceOf = value => ({ code: value.code, stdin: value.stdin, profileId: value.profileId });
 const sameSource = (a, b) => !!a && !!b && JSON.stringify(sourceOf(a)) === JSON.stringify(sourceOf(b));
 const when = value => value ? new Date(value).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
+const organizerMessages = {
+  title: '作品管理', root: '全部练习', groups: '作品组', projects: 'C++ 练习', createGroup: '新建作品组', createProject: '新建练习', groupName: '作品组名称', projectName: '练习名称', open: '打开', rename: '重命名', move: '移动到', delete: '删除', moveUp: '向上排序', moveDown: '向下排序', drag: '拖放排序或移动', dropInside: '拖到这里移入作品组', loading: '正在读取作品…', loadingTargets: '正在读取目标位置…', empty: '这个目录还没有练习。', readOnly: '当前是只读查看，不能修改作品。', saving: '正在保存变更…', retry: '重新读取', cancel: '取消', confirm: '确定', renameTitle: '重命名作品', moveTitle: '移动作品', deleteTitle: '删除作品', deleteQuestion: '确认删除这个作品？', chooseDestination: '选择目标作品组', structureBlocked: '作品组结构异常，已暂停编辑。', noDestinations: '没有可用的目标位置。'
+};
+const organizerIcons = {
+  group: props => <Folder size={20} {...props} />, project: props => <FileCode2 size={20} {...props} />, drag: props => <MoreHorizontal size={17} {...props} />, up: props => <ArrowUp size={16} {...props} />, down: props => <ArrowDown size={16} {...props} />, rename: props => <Settings2 size={15} {...props} />, move: props => <FolderPlus size={15} {...props} />, delete: props => <Trash2 size={15} {...props} />
+};
 
 export default function App() {
   const [config, setConfig] = useState(null);
@@ -34,7 +43,6 @@ export default function App() {
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
   const [classId, setClassId] = useState('');
-  const [search, setSearch] = useState('');
   const [folderId, setFolderId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
@@ -51,6 +59,8 @@ export default function App() {
   const runAttempt = useRef(null);
   const runBusyRef = useRef(false);
   const selectedRunRef = useRef(null);
+  const workspaceCommitterRef = useRef(null);
+  if (!workspaceCommitterRef.current) workspaceCommitterRef.current = createLatestRequestCommitter();
   const toast = useCallback((message, type = 'info') => setNotice({ message, type }), []);
   const draftKey = useCallback(projectId => `cpp:draft:${userRef.current?.id}:${projectId}`, []);
 
@@ -81,9 +91,10 @@ export default function App() {
   }, [notice]);
 
   const refreshWorkspace = useCallback(async (studentId = targetStudent) => {
-    const data = await api(`/workspace${studentId ? `?studentId=${studentId}` : ''}`);
-    setWorkspace(data);
-    return data;
+    return workspaceCommitterRef.current(
+      () => api(`/workspace${studentId ? `?studentId=${studentId}` : ''}`),
+      setWorkspace
+    );
   }, [targetStudent]);
 
   const openProject = useCallback(async projectId => {
@@ -108,13 +119,39 @@ export default function App() {
     finally { if (serial === loadSerial.current) setLoadingProject(false); }
   }, [draftKey, toast]);
 
+  const refreshAfterOrganizerMutation = useCallback(async (path, options) => {
+    try {
+      const deletedProject = options.method === 'DELETE' ? /^\/projects\/([^/]+)$/.exec(path) : null;
+      if (deletedProject) storeLocal(draftKey(decodeURIComponent(deletedProject[1])), null);
+      const data = await refreshWorkspace();
+      if (!data) return;
+      const current = projectRef.current;
+      if (!current) return;
+      const summary = data.projects.find(item => item.id === current.id);
+      if (summary) {
+        const next = { ...current, name: summary.name, parent_id: summary.parent_id };
+        projectRef.current = next; setProject(next);
+      } else if (options.method === 'DELETE' && path === `/projects/${encodeURIComponent(current.id)}`) {
+        projectRef.current = null; savedRef.current = null; setProject(null); setRun(null); setRuns([]); setDirty(false);
+        if (data.projects[0]) await openProject(data.projects[0].id);
+      }
+    } catch (error) { toast(error.message, 'error'); }
+  }, [draftKey, openProject, refreshWorkspace, toast]);
+  const organizerRequest = useCallback(async (path, options = {}) => {
+    const result = await api(path, options);
+    if (options.method && /^\/(?:projects|groups)(?:\/|$)/.test(path)) void refreshAfterOrganizerMutation(path, options);
+    return result;
+  }, [refreshAfterOrganizerMutation]);
+  const organizerAdapter = useMemo(() => createCppProjectOrganizerAdapter({ request: organizerRequest, openProject, writable: Boolean(config?.writesEnabled) }), [config?.writesEnabled, openProject, organizerRequest]);
+  const organizerError = useCallback(error => toast(error.message, 'error'), [toast]);
+
   useEffect(() => {
     if (!user) return;
     let alive = true;
     ++loadSerial.current; projectRef.current = null; savedRef.current = null; setProject(null); setWorkspace(emptyWorkspace);
     setRun(null); setActiveRun(null); setRuns([]); setDirty(false); setDraft(null); setConflict(false);
     refreshWorkspace().then(data => {
-      if (!alive) return;
+      if (!alive || !data) return;
       const last = readLocal(`cpp:last-project:${user.id}`);
       const candidate = data.projects.find(item => item.id === last) || data.projects[0];
       if (candidate) openProject(candidate.id);
@@ -241,7 +278,7 @@ export default function App() {
       else if (modal.type === 'delete-project') {
         await api(`/projects/${modal.item.id}`, { method: 'DELETE' }); storeLocal(draftKey(modal.item.id), null);
         const data = await refreshWorkspace();
-        if (projectRef.current?.id === modal.item.id) { projectRef.current = null; setProject(null); setRun(null); setRuns([]); setDirty(false); if (data.projects[0]) await openProject(data.projects[0].id); }
+        if (data && projectRef.current?.id === modal.item.id) { projectRef.current = null; setProject(null); setRun(null); setRuns([]); setDirty(false); if (data.projects[0]) await openProject(data.projects[0].id); }
       } else if (modal.type === 'delete-group') { await api(`/groups/${modal.item.id}`, { method: 'DELETE' }); if (folderId === modal.item.id) setFolderId(null); await refreshWorkspace(); }
       else if (modal.type === 'distribute') {
         const saved = await save();
@@ -262,17 +299,6 @@ export default function App() {
       toast('已创建自己的独立副本', 'success');
     } catch (error) { toast(error.message, 'error'); }
   };
-  const reorderProject = async direction => {
-    try {
-      const siblings = workspace.projects.filter(item => item.parent_id === project.parent_id);
-      const index = siblings.findIndex(item => item.id === project.id);
-      const target = index + direction;
-      if (target < 0 || target >= siblings.length) return;
-      [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
-      await api('/projects/reorder', { method: 'PUT', body: { parentId: project.parent_id, ids: siblings.map(item => item.id) } });
-      await refreshWorkspace();
-    } catch (error) { toast(error.message, 'error'); }
-  };
   const viewSnapshot = async () => {
     try { const data = await api(`/runs/${run.id}/source`); setModal({ type: 'snapshot', data }); } catch (error) { toast(error.message, 'error'); }
   };
@@ -290,9 +316,6 @@ export default function App() {
   const isTeacher = ['teacher', 'admin'].includes(user.role);
   const readOnly = project?.readOnly || !config.writesEnabled;
   const changedSinceRun = run && project && (run.revision_id !== project.revisionId || dirty);
-  const currentFolder = workspace.groups.find(group => group.id === folderId);
-  const visibleProjects = workspace.projects.filter(item => search ? item.name.toLowerCase().includes(search.toLowerCase()) : item.parent_id === folderId);
-  const visibleGroups = workspace.groups.filter(group => search ? group.name.includes(search) : group.parent_id === folderId);
 
   return <div className="app-shell">
     <header className="topbar">
@@ -309,26 +332,22 @@ export default function App() {
     {page === 'classroom' ? <main className="classroom-page"><div className="page-intro"><div><div className="eyebrow">TEACHING SPACE</div><h1>一起写代码，一起成长。</h1><p>查看班级学生的 C++ 练习，或回到工作台分发你的课堂模板。</p></div><a className="button" href={config.commonDashboard} target="_blank" rel="noopener noreferrer"><Users size={16} />公共班级与个人资料<ExternalLink size={14} /></a></div><div className="class-grid"><section className="class-list"><h2>我的班级 <span>{classes.length}</span></h2>{classes.length ? classes.map(item => <button className={`class-card ${String(item.id) === classId ? 'selected' : ''}`} key={item.id} onClick={() => setClassId(String(item.id))}><span className="class-icon"><GraduationCap size={23} /></span><strong>{item.name}</strong><small>班级码：{item.class_code}</small><ChevronRight size={17} /></button>) : <p className="empty-copy">暂无负责的班级。请在原平台管理班级，入班规则保持不变。</p>}</section><section className="student-panel"><div className="panel-heading"><h2>{classes.find(item => String(item.id) === classId)?.name || '班级学生'}</h2><span className="pill">{students.length} 位同学</span></div><p className="muted">教师只能查看当前归属班级中的学生代码；查看模式不会修改学生作品。</p>{students.map((student, index) => <div className="student-row" key={student.id}><span className="student-number">{String(index + 1).padStart(2, '0')}</span><span className="avatar light">{student.username.slice(0, 1)}</span><strong>{student.username}</strong><button onClick={() => { setTargetStudent(student.id); setFolderId(null); setPage('workspace'); }}>查看练习<ChevronRight size={15} /></button></div>)}{!students.length && <div className="empty-state"><Users size={36} /><h3>这里还没有学生</h3><p>学生使用原平台班级码加入后，就会出现在这里。</p></div>}</section></div></main> : <div className="workspace-layout">
       {sidebarOpen && <button className="sidebar-backdrop" aria-label="关闭项目列表" onClick={() => setSidebarOpen(false)} />}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-heading"><span>{workspace.readOnly ? `${workspace.owner?.username}的练习` : '我的练习'}</span><span className="count">{workspace.projects.length}</span></div>
         {targetStudent && <button className="back-own" onClick={() => { setTargetStudent(null); setFolderId(null); }}><ArrowLeft size={14} />返回我的工作台</button>}
-        <label className="search-field"><Search size={15} /><input aria-label="搜索练习" placeholder="搜索练习名称" value={search} onChange={event => setSearch(event.target.value)} /></label>
-        {!workspace.readOnly && <div className="create-actions"><button className="primary" disabled={!config.writesEnabled} onClick={() => setModal({ type: 'create' })}><Plus size={16} />新建练习</button><button className="icon-button bordered" disabled={!config.writesEnabled} aria-label="新建作品组" onClick={() => setModal({ type: 'group' })}><FolderPlus size={17} /></button></div>}
-        <button className={`folder-root ${folderId === null ? 'selected' : ''}`} onClick={() => { setFolderId(null); setSearch(''); }}><BookOpen size={16} />全部练习<ChevronRight size={14} /></button>
-        {currentFolder && <div className="folder-crumb"><button onClick={() => setFolderId(currentFolder.parent_id)}><ArrowLeft size={13} /></button><span>{currentFolder.name}</span>{!workspace.readOnly && <button aria-label="管理当前作品组" onClick={() => setModal({ type: 'group-settings', item: currentFolder })}><MoreHorizontal size={16} /></button>}</div>}
-        <div className="project-list">{visibleGroups.map(group => <div className="folder-row" key={group.id}><button onClick={() => { setFolderId(group.id); setSearch(''); }}><Folder size={16} /><span>{group.name}</span><ChevronRight size={14} /></button>{!workspace.readOnly && <button className="icon-button" aria-label={`管理作品组 ${group.name}`} onClick={() => setModal({ type: 'group-settings', item: group })}><MoreHorizontal size={14} /></button>}</div>)}{visibleProjects.map(item => <button key={item.id} className={`project-item ${project?.id === item.id ? 'selected' : ''}`} onClick={() => openProject(item.id)}><FileCode2 size={17} /><span><strong>{item.name}</strong><small>main.cpp</small></span>{project?.id === item.id && <span className="selected-dot" />}</button>)}{!visibleProjects.length && !visibleGroups.length && <p className="empty-copy">{search ? '没有找到这个练习' : '还没有练习，从新建开始吧。'}</p>}</div>
+        {!targetStudent && !workspace.readOnly && <button className="organizer-template-button primary" disabled={!config.writesEnabled} onClick={() => setModal({ type: 'create' })}><Sparkles size={16} />从课堂示例新建</button>}
+        <ProjectOrganizer adapter={organizerAdapter} ownerId={targetStudent} currentParentId={folderId} onCurrentParentIdChange={parentId => { setFolderId(parentId); setSidebarOpen(false); }} messages={organizerMessages} icons={organizerIcons} onError={organizerError} />
         <div className="sidebar-bottom"><div className="learning-note"><span className="note-icon"><Sparkles size={18} /></span><strong>每一次尝试，都算进步。</strong><p>先想一想，再写代码。<br />用不同输入检验你的想法。</p></div><div className="queue-hint"><span className="status-dot" /><span>单任务执行 · 最多 20 个待处理</span></div></div>
       </aside>
 
       <main className="main-workspace">
-        {project ? <><div className="workspace-heading"><div className="project-title"><div className="breadcrumb">{workspace.readOnly ? '学生练习' : '我的练习'}<ChevronRight size={12} />{workspace.groups.find(group => group.id === project.parent_id)?.name || '未分组'}</div><h1>{project.name}{project.readOnly && <span className="pill readonly-pill">只读查看</span>}</h1></div><div className="project-tools"><button className="icon-button" aria-label="下载 main.cpp" title="下载 main.cpp" onClick={() => downloadCode(project.code)}><Download size={18} /></button><button className="icon-button" aria-label="复制项目" title="创建自己的副本" onClick={copyProject}><Copy size={17} /></button>{!project.readOnly && <button className="icon-button" aria-label="管理练习" onClick={() => setModal({ type: 'project-settings', item: project })}><MoreHorizontal size={20} /></button>}{isTeacher && !project.readOnly && <button className="distribute-button" disabled={!classes.length || !config.writesEnabled} onClick={() => setModal({ type: 'distribute', item: project, requestId: crypto.randomUUID() })}><Users size={15} />分发到班级</button>}</div></div>
+        {project ? <><div className="workspace-heading"><div className="project-title"><div className="breadcrumb">{workspace.readOnly ? '学生练习' : '我的练习'}<ChevronRight size={12} />{workspace.groups.find(group => group.id === project.parent_id)?.name || '未分组'}</div><h1>{project.name}{project.readOnly && <span className="pill readonly-pill">只读查看</span>}</h1></div><div className="project-tools"><button className="icon-button" aria-label="下载 main.cpp" title="下载 main.cpp" onClick={() => downloadCode(project.code)}><Download size={18} /></button><button className="icon-button" aria-label="复制项目" title="创建自己的副本" onClick={copyProject}><Copy size={17} /></button>{isTeacher && !project.readOnly && <button className="distribute-button" disabled={!classes.length || !config.writesEnabled} onClick={() => setModal({ type: 'distribute', item: project, requestId: crypto.randomUUID() })}><Users size={15} />分发到班级</button>}</div></div>
         {draft && <div className="draft-banner"><AlertTriangle size={16} /><span>发现未保存的本地草稿（{new Date(draft.savedAt).toLocaleString('zh-CN')}）</span><button onClick={() => { const mismatch = draft.version !== project.version; const restored = { ...project, ...sourceOf(draft) }; projectRef.current = restored; setProject(restored); setDirty(true); setDraft(null); setConflict(mismatch); setSaveState(mismatch ? 'error' : 'dirty'); }}>恢复草稿</button><button onClick={() => setModal({ type: 'discard-draft' })}>保留服务器版本</button></div>}
         {conflict && <div className="draft-banner"><AlertTriangle size={16} /><span>版本冲突：自动保存已暂停，请先下载本地代码，再重新载入并合并修改。</span><button onClick={() => downloadCode(project.code, 'main-local-draft.cpp')}>下载本地代码</button><button onClick={() => setModal({ type: 'reload' })}>重新载入</button></div>}
         {project.readOnly && <div className="readonly-banner"><GraduationCap size={16} />正在查看 {project.ownerName} 的代码。不能保存、运行或停止学生任务。<button onClick={copyProject}>复制到我的练习</button></div>}
         <div className="editor-toolbar"><div className="file-tab"><FileCode2 size={16} /><span>main.cpp</span>{dirty && <span className="unsaved-dot" />}</div><span className={`save-indicator ${saveState === 'error' ? 'error-text' : ''}`}>{saveState === 'saving' ? '正在保存…' : saveState === 'error' ? '保存未确认' : dirty ? '待保存' : '已保存'}</span><div className="toolbar-actions"><button className="icon-button" aria-label="编辑器设置" onClick={() => setSettingsOpen(!settingsOpen)}><Settings2 size={17} /></button><button className="save-button" disabled={readOnly || saveState === 'saving' || loadingProject} onClick={() => save()}><Save size={15} /><span>保存</span></button><button className="primary run-button" disabled={readOnly || !!activeRun || runBusy || loadingProject || !!draft || conflict} onClick={runCode}><Play size={15} fill="currentColor" />{runBusy ? '正在提交…' : '保存并运行'}<kbd>Ctrl ↵</kbd></button><button className="icon-button stop-button" aria-label="停止运行" disabled={!activeRun || readOnly || activeRun.state === 'stopping'} onClick={stopRun}><Square size={15} fill="currentColor" /></button></div></div>
-        {settingsOpen && <div className="editor-settings"><label>代码字号<select value={fontSize} onChange={event => { setFontSize(Number(event.target.value)); storeLocal('cpp:font-size', Number(event.target.value)); }}>{[13, 14, 15, 16, 18, 20, 22].map(size => <option key={size}>{size}</option>)}</select></label><label>结果区宽度<input aria-label="结果区宽度" type="range" min="280" max="520" step="20" value={resultWidth} onChange={event => { setResultWidth(Number(event.target.value)); storeLocal('cpp:result-width', Number(event.target.value)); }} /></label><button onClick={() => reorderProject(-1)}><ArrowUp size={14} />练习上移</button><button onClick={() => reorderProject(1)}><ArrowDown size={14} />练习下移</button></div>}
+        {settingsOpen && <div className="editor-settings"><label>代码字号<select value={fontSize} onChange={event => { setFontSize(Number(event.target.value)); storeLocal('cpp:font-size', Number(event.target.value)); }}>{[13, 14, 15, 16, 18, 20, 22].map(size => <option key={size}>{size}</option>)}</select></label><label>结果区宽度<input aria-label="结果区宽度" type="range" min="280" max="520" step="20" value={resultWidth} onChange={event => { setResultWidth(Number(event.target.value)); storeLocal('cpp:result-width', Number(event.target.value)); }} /></label></div>}
         <div className="coding-surface" style={{ '--result-width': `${resultWidth}px` }}><section className="code-pane" aria-label="代码编辑区">{loadingProject && <div className="loading-overlay">正在打开练习…</div>}<CodeEditor value={project.code} onChange={code => edit({ code })} readOnly={!!readOnly || loadingProject} fontSize={fontSize} onSave={save} onRun={runCode} editorRef={editorRef} onCursor={setCursor} /><div className="code-status"><span>C++ · UTF-8</span><span>第 {cursor.line} 行，第 {cursor.column} 列</span><span>版本 {project.version}</span></div></section><aside className="execution-pane"><section className="input-panel"><div className="panel-heading"><h2>测试输入</h2><span>标准输入 stdin</span></div><textarea aria-label="测试输入" spellCheck="false" placeholder="在这里一次填入完整输入数据，例如：\n12 30" value={project.stdin} readOnly={!!readOnly} onChange={event => edit({ stdin: event.target.value })} /><div className="input-hint">输入会随代码一起保存。运行开始后不再追加输入。</div></section><section className="result-panel"><div className="panel-heading"><h2>运行结果</h2><span className={`run-state ${run?.state || ''}`}>{run ? STATE_LABELS[run.state] : '等待运行'}</span></div><div className="result-tabs" role="tablist" aria-label="结果类型">{[['stdout', '输出'], ['stderr', '错误'], ['compiler_output', '编译信息'], ['history', '历史']].map(([value, label]) => <button role="tab" aria-selected={resultTab === value} className={resultTab === value ? 'selected' : ''} key={value} onClick={() => setResultTab(value)}>{label}{value === 'compiler_output' && run?.diagnostics?.length > 0 && <span>{run.diagnostics.length}</span>}</button>)}</div>{run && <div className="run-meta"><span>版本 {run.version} · {when(run.created_at)}</span><span>{run.elapsed_ms == null ? '耗时 —' : `${run.elapsed_ms} ms`}</span><span>{run.memory_bytes == null ? '内存 —' : `${(run.memory_bytes / 1048576).toFixed(1)} MB`}</span></div>}{changedSinceRun && <div className="version-note">结果对应之前保存的版本，当前代码或输入已有变化。</div>}{activeRun && <div className="active-note"><Clock3 size={14} />{STATE_LABELS[activeRun.state]}{activeRun.queuePosition ? ` · 队列位置 ${activeRun.queuePosition}` : ''}{activeRun.message && <span>{activeRun.message}</span>}</div>}
           <div className="result-content">{resultTab === 'history' ? <>{runs.map(item => <button className={`history-item ${run?.id === item.id ? 'selected' : ''}`} key={item.id} onClick={() => selectHistory(item)}><span>{STATE_LABELS[item.state]}</span><small>v{item.version} · {when(item.created_at)}</small></button>)}{!runs.length && <p className="empty-copy">暂无历史运行记录。缓存最多保留一天。</p>}</> : !run ? <div className="result-empty"><span className="terminal-symbol">&gt;_</span><h3>准备好，运行你的想法。</h3><p>填写测试输入，点击「保存并运行」。<br />这里会显示程序输出和编译信息。</p>{!config.runEnabled && <span className="pill">当前环境未启用真实编译</span>}</div> : <>{resultTab === 'compiler_output' && run.diagnostics?.map((item, index) => <button disabled={!!changedSinceRun} className="diagnostic" key={index} onClick={() => { const view = editorRef.current; if (!view) return; const line = view.state.doc.line(Math.min(item.line, view.state.doc.lines)); view.dispatch({ selection: { anchor: Math.min(line.to, line.from + item.column - 1) }, scrollIntoView: true }); view.focus(); }}><span>{item.severity === 'warning' ? '警告' : '提示'} · 第 {item.line} 行</span>{item.message}</button>)}<pre aria-live="polite">{run[resultTab] || (resultTab === 'stdout' && run.state === 'completed' ? '程序已结束，没有标准输出。' : '暂无内容')}</pre>{run.message && !ACTIVE_STATES.includes(run.state) && <p className="run-message">{run.message}</p>}</>}</div>{run && <button className="snapshot-button" onClick={viewSnapshot}>查看本次运行的代码与输入<ChevronRight size={13} /></button>}<div className="result-disclaimer">运行完成不代表答案正确 · 耗时为执行阶段墙钟时间</div></section></aside></div>
-        <footer className="workspace-footer"><span><span className="status-dot" />{config.runEnabled ? '运行任务由独立服务执行' : '编辑与保存可用 · 真实执行未启用'}</span><label>编译配置<select aria-label="编译配置" disabled={!!readOnly} value={project.profileId} onChange={event => edit({ profileId: event.target.value })}>{config.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label><button className={aiOpen ? 'ai-toggle selected' : 'ai-toggle'} onClick={() => setAiOpen(!aiOpen)}><Sparkles size={14} />AI 学习助手<span>预留</span></button></footer>{aiOpen && <div className="ai-placeholder"><Sparkles size={20} /><div><strong>AI 学习助手 · 暂未开放</strong><p>未来可用于解释编译错误、提供分级提示和检查边界条件。首版不调用 AI，也不扣除 Token。</p></div><button className="icon-button" aria-label="收起 AI 面板" onClick={() => setAiOpen(false)}><X size={17} /></button></div>}</> : <div className="empty-workspace"><Braces size={46} /><div className="eyebrow">YOUR NEXT SMALL STEP</div><h1>{workspace.readOnly ? '这位同学还没有 C++ 练习' : '从第一行代码开始。'}</h1><p>{workspace.readOnly ? '学生保存练习后，可以在这里查看。' : '创建一个练习，或者从课堂示例开始。每次运行前，代码都会先保存。'}</p>{!workspace.readOnly && <button className="primary" onClick={() => setModal({ type: 'create' })}><Plus size={16} />创建我的练习</button>}</div>}
+        <footer className="workspace-footer"><span><span className="status-dot" />{config.runEnabled ? '运行任务由独立服务执行' : '编辑与保存可用 · 真实执行未启用'}</span><label>编译配置<select aria-label="编译配置" disabled={!!readOnly} value={project.profileId} onChange={event => edit({ profileId: event.target.value })}>{config.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name}</option>)}</select></label><button className={aiOpen ? 'ai-toggle selected' : 'ai-toggle'} onClick={() => setAiOpen(!aiOpen)}><Sparkles size={14} />AI 学习助手<span>预留</span></button></footer>{aiOpen && <div className="ai-placeholder"><Sparkles size={20} /><div><strong>AI 学习助手 · 暂未开放</strong><p>未来可用于解释编译错误、提供分级提示和检查边界条件。首版不调用 AI，也不扣除 Token。</p></div><button className="icon-button" aria-label="收起 AI 面板" onClick={() => setAiOpen(false)}><X size={17} /></button></div>}</> : <div className="empty-workspace"><Braces size={46} /><div className="eyebrow">YOUR NEXT SMALL STEP</div><h1>{workspace.readOnly ? '这位同学还没有 C++ 练习' : '从第一行代码开始。'}</h1><p>{workspace.readOnly ? '学生保存练习后，可以在这里查看。' : '请在左侧新建练习，或者从课堂示例开始。每次运行前，代码都会先保存。'}</p>{!workspace.readOnly && <button className="primary" onClick={() => setModal({ type: 'create' })}><Sparkles size={16} />从课堂示例创建</button>}</div>}
       </main>
     </div>}
     {modal && <ActionModal key={`${modal.type}:${modal.item?.id || ''}`} modal={modal} groups={workspace.groups} classes={classes} onClose={() => setModal(null)} onSubmit={executeModal} onDelete={type => setModal({ type, item: modal.item })} />}

@@ -1,7 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
+import '@tigao/organizer-react/styles.css';
 import './styles.css';
+import './organizer-overrides.css';
 
 class ErrorBoundary extends React.Component {
   state = { failed: false };

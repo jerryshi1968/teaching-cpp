@@ -36,6 +36,7 @@ export function createApp(service, config) {
   route('get', '/examples', () => EXAMPLES.map(({ id, name, topic, description }) => ({ id, name, topic, description })));
   route('post', '/projects', req => service.createProject(req.user, req.body), 201);
   route('put', '/projects/reorder', req => service.reorder(req.user, 'projects', req.body));
+  route('put', '/projects/:id/reposition', req => service.repositionProject(req.user, req.params.id, req.body));
   route('get', '/projects/:id', req => service.getProject(req.user, req.params.id));
   route('put', '/projects/:id/source', req => service.saveProject(req.user, req.params.id, req.body));
   route('post', '/projects/:id/run', req => service.saveAndRun(req.user, req.params.id, req.body), 202);
@@ -46,6 +47,7 @@ export function createApp(service, config) {
   route('delete', '/projects/:id', req => service.deleteProject(req.user, req.params.id));
   route('post', '/groups', req => service.createGroup(req.user, req.body), 201);
   route('put', '/groups/reorder', req => service.reorder(req.user, 'groups', req.body));
+  route('put', '/groups/:id/reposition', req => service.repositionGroup(req.user, req.params.id, req.body));
   route('patch', '/groups/:id', req => service.updateGroup(req.user, req.params.id, req.body));
   route('delete', '/groups/:id', req => service.deleteGroup(req.user, req.params.id));
   route('get', '/classes', req => service.classes(req.user));

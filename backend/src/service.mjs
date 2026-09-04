@@ -34,6 +34,59 @@ export class CppService {
     if (parentId !== null) assert(await tx.one('groups', { id: parentId, user_id: userId }), 400, 'INVALID_GROUP', '目标作品组不属于当前用户或 C++ 平台');
     return parentId;
   }
+  position(body, kind) {
+    assert(body && Object.hasOwn(body, 'parentId') && Object.hasOwn(body, 'beforeId'), 400, 'INVALID_ID', '定位时必须显式提供 parentId 和 beforeId');
+    return {
+      parentId: body.parentId === null ? null : numberId(body.parentId),
+      beforeId: body.beforeId === null ? null : kind === 'projects' ? id(body.beforeId) : numberId(body.beforeId)
+    };
+  }
+  async groupAccess(tx, user, groupId) {
+    groupId = numberId(groupId);
+    const group = await tx.one('groups', { id: groupId, user_id: user.id });
+    assert(group, 404, 'GROUP_NOT_FOUND', '作品组不存在或无权访问');
+    return group;
+  }
+  async groupParentAccess(tx, userId, groupId, parentId) {
+    parentId = await this.parentAccess(tx, userId, parentId);
+    let cursor = parentId;
+    const visited = new Set([groupId]);
+    while (cursor !== null) {
+      assert(!visited.has(cursor), 400, 'GROUP_CYCLE', '不能将作品组移入自身或其子组');
+      visited.add(cursor);
+      const ancestor = await tx.one('groups', { id: cursor, user_id: userId });
+      assert(ancestor, 400, 'INVALID_GROUP', '父作品组关系不完整');
+      cursor = ancestor.parent_id;
+    }
+    return parentId;
+  }
+  async reposition(tx, user, kind, source, parentId, beforeId) {
+    if (kind === 'groups') parentId = await this.groupParentAccess(tx, user.id, source.id, parentId);
+    else parentId = await this.parentAccess(tx, user.id, parentId);
+    const sourceParentId = source.parent_id ?? null;
+    const sourceRows = (await tx.find(kind, { user_id: user.id, parent_id: sourceParentId })).sort(byOrder);
+    const sameParent = same(sourceParentId, parentId);
+    const targetRows = sameParent ? sourceRows : (await tx.find(kind, { user_id: user.id, parent_id: parentId })).sort(byOrder);
+    const sourceOrder = sourceRows.filter(row => !same(row.id, source.id));
+    const targetOrder = targetRows.filter(row => !same(row.id, source.id));
+    let targetIndex = targetOrder.length;
+    if (beforeId !== null) {
+      targetIndex = targetOrder.findIndex(row => same(row.id, beforeId));
+      assert(targetIndex >= 0, 400, 'INVALID_BEFORE', '目标位置不属于指定作品组或当前用户');
+    }
+    targetOrder.splice(targetIndex, 0, source);
+    const updatedAt = now();
+    await tx.update(kind, { id: source.id, user_id: user.id }, { parent_id: parentId, updated_at: updatedAt });
+    const rewrite = async (rows, rowParentId) => {
+      for (const [index, row] of rows.entries()) await tx.update(kind, { id: row.id, user_id: user.id, parent_id: rowParentId }, { sort_order: index });
+    };
+    if (sameParent) await rewrite(targetOrder, parentId);
+    else {
+      await rewrite(sourceOrder, sourceParentId);
+      await rewrite(targetOrder, parentId);
+    }
+    return { ...source, parent_id: parentId, sort_order: targetIndex, updated_at: updatedAt };
+  }
   async workspace(user, targetId = null) {
     const ownerId = targetId ? numberId(targetId) : user.id;
     assert(await this.canViewOwner(this.repo, user, ownerId), 403, 'STUDENT_FORBIDDEN', '只能查看自己班级中的学生');
@@ -103,12 +156,23 @@ export class CppService {
   async updateProject(user, projectId, body) {
     this.writable();
     return this.repo.transaction(async tx => {
-      const project = await this.projectAccess(tx, user, projectId, true);
+      let project = await this.projectAccess(tx, user, projectId, true);
       const changes = { updated_at: now() };
       if ('name' in body) changes.name = name(body.name);
-      if ('parentId' in body) changes.parent_id = await this.parentAccess(tx, user.id, body.parentId);
+      if ('parentId' in body) {
+        const parentId = await this.parentAccess(tx, user.id, body.parentId);
+        if (!same(project.parent_id ?? null, parentId)) project = await this.reposition(tx, user, 'projects', project, parentId, null);
+      }
       await tx.update('projects', { id: project.id, user_id: user.id }, changes);
       return { ...project, ...changes };
+    });
+  }
+  async repositionProject(user, projectId, body) {
+    this.writable();
+    const position = this.position(body, 'projects');
+    return this.repo.transaction(async tx => {
+      const project = await this.projectAccess(tx, user, projectId, true);
+      return { repositioned: true, project: await this.reposition(tx, user, 'projects', project, position.parentId, position.beforeId) };
     });
   }
   async copyProject(user, projectId, body) {
@@ -146,25 +210,23 @@ export class CppService {
   async updateGroup(user, groupId, body) {
     this.writable();
     return this.repo.transaction(async tx => {
-      groupId = numberId(groupId);
-      const group = await tx.one('groups', { id: groupId, user_id: user.id });
-      assert(group, 404, 'GROUP_NOT_FOUND', '作品组不存在或无权访问');
+      let group = await this.groupAccess(tx, user, groupId);
       const changes = { updated_at: now() };
       if ('name' in body) changes.name = name(body.name);
       if ('parentId' in body) {
-        changes.parent_id = await this.parentAccess(tx, user.id, body.parentId);
-        let cursor = changes.parent_id;
-        const visited = new Set([groupId]);
-        while (cursor !== null) {
-          assert(!visited.has(cursor), 400, 'GROUP_CYCLE', '不能将作品组移入自身或其子组');
-          visited.add(cursor);
-          const ancestor = await tx.one('groups', { id: cursor, user_id: user.id });
-          assert(ancestor, 400, 'INVALID_GROUP', '父作品组关系不完整');
-          cursor = ancestor.parent_id;
-        }
+        const parentId = await this.groupParentAccess(tx, user.id, group.id, body.parentId);
+        if (!same(group.parent_id ?? null, parentId)) group = await this.reposition(tx, user, 'groups', group, parentId, null);
       }
-      await tx.update('groups', { id: groupId, user_id: user.id }, changes);
+      await tx.update('groups', { id: group.id, user_id: user.id }, changes);
       return { ...group, ...changes };
+    });
+  }
+  async repositionGroup(user, groupId, body) {
+    this.writable();
+    const position = this.position(body, 'groups');
+    return this.repo.transaction(async tx => {
+      const group = await this.groupAccess(tx, user, groupId);
+      return { repositioned: true, group: await this.reposition(tx, user, 'groups', group, position.parentId, position.beforeId) };
     });
   }
   async deleteGroup(user, groupId) {

@@ -14,10 +14,12 @@
 | `GET /projects/:id` | 当前代码、输入、配置、版本、只读权限 |
 | `PUT /projects/:id/source` | `{code,stdin,profileId,version}` 保存 |
 | `PATCH /projects/:id` | `{name?,parentId?}` 重命名/移动 |
+| `PUT /projects/:id/reposition` | `{parentId,beforeId}` 在一次事务中移动作品并确定目标位置；两字段都必须显式提供且可为 `null` |
 | `DELETE /projects/:id` | 删除自己的项目；有未完成任务时拒绝 |
 | `POST /projects/:id/copy` | 创建自己的独立副本 |
 | `PUT /projects/reorder` | `{parentId,ids}` 必须含当前组全部同类项目且不重复 |
 | `POST /groups`、`PATCH /groups/:id`、`DELETE /groups/:id` | 作品组管理；只允许删除空组 |
+| `PUT /groups/:id/reposition` | `{parentId,beforeId}` 在一次事务中移动作品组并确定目标位置；拒绝移入自身或后代 |
 | `PUT /groups/reorder` | 同类作品组排序接口 |
 | `GET /classes`、`GET /classes/:id/students` | 读取自己负责的班级和学生；不改变入班逻辑 |
 | `POST /projects/:id/distribute` | `{classId,requestId}` 给本班学生分发独立副本 |
@@ -28,6 +30,8 @@
 | `POST /runs/:id/stop` | 只允许任务所有者停止；请求体 `{}` |
 
 `requestId` 是浏览器生成 UUID。运行同一请求编号和相同源码/输入重复提交会返回同一任务，改变内容则拒绝。分发同一请求编号只创建一次；不同编号表示主动新分发。
+
+两个 `reposition` 接口中，`parentId:null` 表示根目录，`beforeId:null` 表示追加到目标目录末尾；非空 `beforeId` 必须是当前用户、C++ 类型和目标目录中的同类记录，且不能指向被移动项自身。作品接口成功返回 `{repositioned:true,project:{…}}`，作品组接口成功返回 `{repositioned:true,group:{…}}`。移动父组、循环校验和受影响目录的连续排序重写在同一个数据库事务内完成；跨目录移动会同时归一化源目录和目标目录，排序从 0 开始。旧 `PATCH` 在父组不变时不会改变位置，真正跨父组时会复用该事务逻辑并追加到目标目录末尾。
 
 版本从 1 递增。源码、stdin、profileId 均未变时保存不增加版本；输入改变也会形成新版本。版本冲突返回 409 / `VERSION_CONFLICT`，前端保留草稿、暂停自动保存，不自动覆盖。
 

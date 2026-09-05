@@ -844,6 +844,18 @@
   box-shadow: none;
 }
 
+.organizer-showcase .tigao-organizer__breadcrumb--drop-enabled {
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumb--over {
+  border-color: #10b981;
+  background: #d1fae5;
+  color: #047857;
+  box-shadow: 0 0 0 4px #a7f3d099;
+  transform: scale(1.05);
+}
+
 .organizer-showcase .tigao-organizer__create-panel {
   display: none;
 }
@@ -1070,6 +1082,18 @@
 
 .organizer-showcase .tigao-organizer__nest-target--over {
   opacity: 1;
+}
+
+.organizer-showcase .tigao-organizer__drag-overlay {
+  max-width: 288px;
+  border: 4px solid #c7d2fe;
+  border-radius: 16px;
+  background: #fff;
+  color: #4f46e5;
+  box-shadow: 0 24px 48px #1e293b38;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 850;
 }
 
 .organizer-showcase .tigao-organizer__card-actions {

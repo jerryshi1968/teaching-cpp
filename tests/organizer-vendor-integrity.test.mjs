@@ -8,10 +8,10 @@ const lockBytes = fs.readFileSync(new URL('../package-lock.json', import.meta.ur
 const lock = JSON.parse(lockBytes);
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const packages = {
-  '@tigao/organizer-contracts': ['tigao-organizer-contracts-0.1.0.tgz', '12fe52ed826cef07c49bba57d7a496db16605a4ee6b667d331f11788c4fcb3e3', 'runtime'],
-  '@tigao/organizer-core': ['tigao-organizer-core-0.1.0.tgz', 'ec1735f27f792ed989c433a34cbe4f3fb0cab909494b3a9474575c5cebd045ca', 'runtime'],
-  '@tigao/organizer-react': ['tigao-organizer-react-0.1.0.tgz', 'f105d43f02937228a94b018b37c997039eab6fefe37dbabc5f744482bc6b7e65', 'runtime'],
-  '@tigao/organizer-contract-tests': ['tigao-organizer-contract-tests-0.1.0.tgz', '327a1cc924dbb58e9e635bc23eb38d8d43292d30809936b500889fdd078b68bd', 'development']
+  '@tigao/organizer-contracts': ['tigao-organizer-contracts-0.1.1.tgz', 'ac679b90be4e1016c2d1c4eb6694765029eef03765d74066b1f9cd276b8bfc6b', 'runtime'],
+  '@tigao/organizer-core': ['tigao-organizer-core-0.1.1.tgz', '7952036f6b4098f430517d374d33231680f5c41ad51ce60793f96fb53a43bdf1', 'runtime'],
+  '@tigao/organizer-react': ['tigao-organizer-react-0.1.1.tgz', '54bb393f406d8dbb21978e934a6b82ac0a021165470c664a5afd4e1d6536f936', 'runtime'],
+  '@tigao/organizer-contract-tests': ['tigao-organizer-contract-tests-0.1.1.tgz', '11e5a2c4fbcab61a0d8d00329ed77bae835669f7b7a2201b010585b907fc2c71', 'development']
 };
 
 test('organizer 安装包固定在仓库 vendor 目录并保持发布 SHA256', () => {

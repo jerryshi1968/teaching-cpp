@@ -66,4 +66,6 @@ test('拖放时卡片主体负责排序，独立下部区域负责移入作品�
   assert.match(organizerStyles, /\.tigao-organizer__nest-target \{[^}]*right: 26px;[^}]*bottom: 18px;[^}]*left: 26px;[^}]*height: 48px;/);
   assert.match(organizerStyles, /:has\(\.tigao-organizer__card--dragging\)[^\{]*\.tigao-organizer__card--group:not\(\.tigao-organizer__card--dragging\)[^\{]*\.tigao-organizer__nest-target \{\s*opacity: 0\.8;/);
   assert.match(organizerStyles, /\.tigao-organizer__card--dragging \.tigao-organizer__nest-target \{\s*display: none;/);
+  assert.match(organizerStyles, /\.tigao-organizer__breadcrumb--over \{[^}]*background: #d1fae5;[^}]*box-shadow: 0 0 0 4px #a7f3d099;[^}]*transform: scale\(1\.05\);/);
+  assert.match(organizerStyles, /\.tigao-organizer__drag-overlay \{[^}]*border: 4px solid #c7d2fe;[^}]*box-shadow: 0 24px 48px #1e293b38;/);
 });

@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { activateFrontend, assertProductionConfig, CURRENT_FRONTEND_FILES, restoreFrontend, SOURCE_COMMIT, VERSION } from '../deploy/frontend-update-20260905-02/guard.mjs';
-import { verifyMaterials } from '../deploy/frontend-update-20260905-02/update.mjs';
+import { activateFrontend, assertProductionConfig, CURRENT_FRONTEND_FILES, restoreFrontend, SOURCE_COMMIT, VERSION } from '../deploy/frontend-update-20260905-03/guard.mjs';
+import { verifyMaterials } from '../deploy/frontend-update-20260905-03/update.mjs';
 
 test('新前端发布材料固定来源提交、构建文件及四个 vendor 包', () => {
   const materials = verifyMaterials();
@@ -52,14 +52,16 @@ test('前端目录切换保留旧版并能把失败新版换回旧版', async t 
 });
 
 test('新发布程序不包含服务重启、Apache 重载或数据库命令', async () => {
-  const source = await fs.readFile(new URL('../deploy/frontend-update-20260905-02/update.mjs', import.meta.url), 'utf8');
+  const source = await fs.readFile(new URL('../deploy/frontend-update-20260905-03/update.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /run\(['"]systemctl['"]/);
   assert.doesNotMatch(source, /run\(PM2, \[['"](?:save|start|stop|restart|reload|delete)['"]/);
   assert.doesNotMatch(source, /\b(?:mysql|mysqldump|db:migrate)\b/i);
+  assert.match(source, /fs\.chmodSync\(staging, 0o755\)/);
+  assert.match(source, /fs\.chmodSync\(staging \+ '\/assets', 0o755\)/);
 });
 
 test('Windows 本地只执行材料检查，生产预检在读取服务器前拒绝', () => {
-  const script = fileURLToPath(new URL('../deploy/frontend-update-20260905-02/update.mjs', import.meta.url));
+  const script = fileURLToPath(new URL('../deploy/frontend-update-20260905-03/update.mjs', import.meta.url));
   const checked = spawnSync(process.execPath, [script, '--check-only'], { encoding: 'utf8' });
   assert.equal(checked.status, 0, checked.stderr);
   assert.match(checked.stdout, /未读取生产配置、未连接服务、未修改文件/);

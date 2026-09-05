@@ -1,143 +1,569 @@
-.sidebar {
-  width: 316px;
-  overflow-y: auto;
+.organizer-page {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 34px 24px 48px;
+  background:
+    radial-gradient(circle at 15% 0%, #dff3ff 0, transparent 34%),
+    radial-gradient(circle at 88% 12%, #ece8ff 0, transparent 31%),
+    linear-gradient(180deg, #e8f5ff 0%, #f1f1ff 52%, #fff0f7 100%);
+}
+
+.organizer-page__inner {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.organizer-owner-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 92px;
+  margin-bottom: 30px;
+  padding: 20px 24px;
+  border: 4px solid #e1e4ff;
+  border-radius: 30px;
+  background: #ffffffd9;
+  box-shadow: 0 7px 18px #3341550d;
+}
+
+.organizer-owner-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 2px solid #c7d2fe;
+  border-radius: 16px;
+  color: #5b67d9;
+  background: #eef2ff;
+}
+
+.organizer-owner-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.organizer-owner-copy span {
+  color: #8a98af;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.organizer-owner-copy strong {
+  overflow: hidden;
+  color: #26334a;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organizer-owner-actions {
+  display: flex;
+  gap: 9px;
+  margin-left: auto;
+}
+
+.organizer-owner-actions button,
+.organizer-template-button,
+.editor-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 39px;
+  border: 2px solid #cdd6f4;
+  border-radius: 15px;
+  background: #fff;
+  color: #5e6fb5;
+  font-size: 12px;
+  font-weight: 750;
+  box-shadow: 0 3px 7px #3341550a;
+}
+
+.organizer-owner-actions .back-own {
+  margin: 0;
+  background: #fff;
+}
+
+.organizer-showcase__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 0 2px 21px;
+  border-bottom: 2px solid #dce4f29c;
+}
+
+.organizer-kicker {
+  margin-bottom: 7px;
+  color: #727fd1;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.organizer-showcase__heading h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #1e293b;
+  font-size: 25px;
+  font-weight: 850;
+  letter-spacing: .2px;
+}
+
+.organizer-showcase__heading h1 svg {
+  color: #f6bf26;
+}
+
+.organizer-showcase__heading p {
+  margin: 7px 0 0;
+  color: #8a9ab4;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.7;
 }
 
 .organizer-template-button {
-  width: 100%;
-  margin-bottom: 14px;
   flex-shrink: 0;
+  min-height: 45px;
+  padding: 10px 18px;
+  border-color: #d29b14;
+  border-width: 2px 2px 4px;
+  background: #fbbf24;
+  color: #5d3b00;
+  font-size: 13px;
 }
 
-.sidebar > .tigao-organizer {
-  --organizer-color-text: #42536d;
-  --organizer-color-muted: #8795aa;
-  --organizer-color-subtle: #f1f4f8;
-  --organizer-color-accent: #587bd0;
-  --organizer-color-accent-soft: #edf3ff;
-  --organizer-color-border: #dfe5ef;
-  --organizer-radius: 9px;
-  --organizer-gap: 9px;
+.organizer-template-button:hover:not(:disabled) {
+  background: #fcd34d;
 }
 
-.sidebar .tigao-organizer__header {
+.organizer-showcase > .tigao-organizer {
+  --organizer-color-text: #334155;
+  --organizer-color-muted: #8a9ab4;
+  --organizer-color-surface: #ffffff;
+  --organizer-color-subtle: #f7f8ff;
+  --organizer-color-accent: #6875e8;
+  --organizer-color-accent-soft: #eef0ff;
+  --organizer-color-border: #dfe5f0;
+  --organizer-radius: 18px;
+  --organizer-gap: 20px;
+  --organizer-shadow: 0 7px 16px #3341550d;
+}
+
+.organizer-showcase .tigao-organizer__header {
+  min-height: 20px;
+  justify-content: flex-end;
   margin-bottom: 10px;
 }
 
-.sidebar .tigao-organizer__header h1 {
-  font-size: 15px;
+.organizer-showcase .tigao-organizer__header > div:first-child {
+  display: none;
 }
 
-.sidebar .tigao-organizer__header p,
-.sidebar .tigao-organizer__header [role="status"] {
-  font-size: 10px;
-}
-
-.sidebar .tigao-organizer__breadcrumbs {
-  margin-bottom: 10px;
-}
-
-.sidebar .tigao-organizer__breadcrumb {
-  font-size: 10px;
-  padding: 5px 7px;
-}
-
-.sidebar .tigao-organizer__create-panel {
-  grid-template-columns: 1fr;
-  padding: 10px;
-  margin-bottom: 14px;
-}
-
-.sidebar .tigao-organizer__create-form label {
-  font-size: 10px;
-}
-
-.sidebar .tigao-organizer__create-form input {
+.organizer-showcase .tigao-organizer__header [role="status"] {
+  color: #6573c3;
   font-size: 11px;
-  padding: 7px;
+  font-weight: 700;
 }
 
-.sidebar .tigao-organizer__create-form button {
-  font-size: 10px;
-  padding: 7px;
+.organizer-showcase .tigao-organizer__breadcrumbs {
+  margin-bottom: 19px;
+  gap: 7px;
 }
 
-.sidebar .tigao-organizer__content {
+.organizer-showcase .tigao-organizer__breadcrumb {
+  min-height: 30px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffffb8;
+  color: #71809a;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumb[aria-current="page"] {
+  background: #7c83ef;
+  color: #fff;
+  box-shadow: 0 4px 10px #6d72df33;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumb-part {
+  color: #c0c9d8;
+  font-size: 11px;
+}
+
+.organizer-showcase .tigao-organizer__create-panel {
   gap: 15px;
+  margin-bottom: 28px;
+  padding: 17px;
+  border: 2px solid #e4e7f5;
+  border-radius: 22px;
+  background: #ffffffa8;
 }
 
-.sidebar .tigao-organizer__section {
-  gap: 8px;
+.organizer-showcase .tigao-organizer__create-form label {
+  color: #7f8da4;
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.sidebar .tigao-organizer__section h2 {
+.organizer-showcase .tigao-organizer__create-form input {
+  min-height: 40px;
+  border: 2px solid #dfe5f0;
+  border-radius: 13px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.organizer-showcase .tigao-organizer__create-form button {
+  min-height: 40px;
+  border: 2px solid #cbd5f3;
+  border-radius: 13px;
+  padding-inline: 15px;
+  background: #fff;
+  color: #596cc1;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.organizer-showcase .tigao-organizer__create-form:last-child button {
+  border-color: #d49c13;
+  background: #fbbf24;
+  color: #5d3b00;
+}
+
+.organizer-showcase .tigao-organizer__content {
+  gap: 27px;
+}
+
+.organizer-showcase .tigao-organizer__section {
+  gap: 13px;
+}
+
+.organizer-showcase .tigao-organizer__section h2 {
+  color: #71809b;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .12em;
+}
+
+.organizer-showcase .tigao-organizer__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.organizer-showcase .tigao-organizer__card {
+  min-height: 176px;
+  border: 4px solid #c7d2fe;
+  border-radius: 31px;
+  background: #ffffffdf;
+  box-shadow: var(--organizer-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease, opacity 150ms ease;
+}
+
+.organizer-showcase .tigao-organizer__card::after {
+  content: "✦";
+  position: absolute;
+  top: -12px;
+  right: -7px;
+  color: #94a3b838;
+  font-size: 58px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.organizer-showcase .tigao-organizer__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 13px 25px #33415514;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-groups-title"] .tigao-organizer__card {
+  border-color: #c7d2fe;
+  background: #f2f3ffe8;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 1) {
+  border-color: #7dd3fc;
+  background: #f0faffeb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 2) {
+  border-color: #fcd34d;
+  background: #fffbebeb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 3) {
+  border-color: #6ee7b7;
+  background: #ecfdf5eb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 4) {
+  border-color: #fda4af;
+  background: #fff1f2eb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 5) {
+  border-color: #d8b4fe;
+  background: #faf5ffeb;
+}
+
+.organizer-showcase .tigao-organizer__item-main {
+  align-items: flex-start;
+  gap: 13px;
+  min-height: 104px;
+  padding: 20px 18px 12px;
+}
+
+.organizer-showcase .tigao-organizer__item-symbol {
+  flex-basis: 41px;
+  width: 41px;
+  height: 41px;
+  border: 0;
+  border-radius: 14px;
+  background: #ffffffa6;
+  color: #6675d9;
+}
+
+.organizer-showcase .tigao-organizer__item-copy {
+  gap: 9px;
+  padding-top: 2px;
+}
+
+.organizer-showcase .tigao-organizer__item-copy strong {
+  padding-right: 17px;
+  color: #273449;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.organizer-showcase .tigao-organizer__item-copy small {
+  color: #8b9ab2;
+  font-family: Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: .02em;
+}
+
+.organizer-showcase .tigao-organizer__open-label {
+  color: #7686a0;
   font-size: 10px;
+  font-weight: 750;
 }
 
-.sidebar .tigao-organizer__grid {
-  grid-template-columns: 1fr;
-  gap: 8px;
+.organizer-showcase .tigao-organizer__nest-target {
+  margin: -5px 15px 8px;
+  border: 2px dashed #d3dbea;
+  border-radius: 11px;
+  background: #ffffff6b;
+  color: #8b9ab2;
+  font-size: 9px;
+  font-weight: 700;
 }
 
-.sidebar .tigao-organizer__card {
+.organizer-showcase .tigao-organizer__card-actions {
+  min-height: 52px;
+  gap: 2px;
+  border-top: 2px solid #e7ebf27d;
+  padding: 8px 12px;
+}
+
+.organizer-showcase .tigao-organizer__icon-button {
+  position: relative;
+  z-index: 1;
+  width: 31px;
+  height: 31px;
+  border-radius: 11px;
+  color: #8ea0ba;
+}
+
+.organizer-showcase .tigao-organizer__icon-button:hover:not(:disabled) {
+  background: #fff;
+  color: #596bd0;
+}
+
+.organizer-language-badge {
+  position: relative;
+  z-index: 1;
+  margin-left: auto;
+  padding: 5px 10px;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #5566c8;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.organizer-showcase .tigao-organizer__readonly,
+.organizer-showcase .tigao-organizer__empty,
+.organizer-showcase .tigao-organizer__warning,
+.organizer-showcase .tigao-organizer__alert {
+  border: 2px solid #e1e6f2;
+  border-radius: 22px;
+  background: #ffffffb8;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.organizer-showcase .tigao-organizer__empty {
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  border: 4px dashed #cbd5e1;
+  border-radius: 36px;
+  color: #8190a6;
+}
+
+.organizer-showcase .tigao-organizer__dialog {
+  border: 4px solid #fff;
+  border-radius: 28px;
+}
+
+.organizer-page-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 31px;
+  padding: 14px 17px;
+  border: 1px solid #dfe5f0;
+  border-radius: 16px;
+  background: #ffffff87;
+  color: #8695aa;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.organizer-page-note .note-icon {
+  display: inline-grid;
+  place-items: center;
+  color: #7385c4;
+}
+
+.organizer-page-note strong {
+  color: #66758e;
+}
+
+.organizer-page-note .queue-hint {
+  margin-left: auto;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.editor-layout .main-workspace {
+  padding-inline: 24px;
+}
+
+.editor-layout .project-title {
+  flex: 1;
+}
+
+.editor-back-button {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-width: 1px;
+  border-radius: 10px;
   box-shadow: none;
 }
 
-.sidebar .tigao-organizer__item-main {
-  min-height: 57px;
-  padding: 9px;
-}
+@media (max-width: 900px) {
+  .organizer-page {
+    padding: 25px 18px 38px;
+  }
 
-.sidebar .tigao-organizer__item-symbol {
-  flex-basis: 32px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-}
+  .organizer-showcase .tigao-organizer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
 
-.sidebar .tigao-organizer__item-copy strong {
-  font-size: 11px;
-}
-
-.sidebar .tigao-organizer__item-copy small,
-.sidebar .tigao-organizer__open-label {
-  font-size: 9px;
-}
-
-.sidebar .tigao-organizer__nest-target {
-  font-size: 9px;
-}
-
-.sidebar .tigao-organizer__card-actions {
-  padding: 6px 8px;
-}
-
-.sidebar .tigao-organizer__icon-button {
-  width: 30px;
-  height: 30px;
-}
-
-.sidebar .tigao-organizer__alert,
-.sidebar .tigao-organizer__warning,
-.sidebar .tigao-organizer__readonly,
-.sidebar .tigao-organizer__empty {
-  font-size: 10px;
-  padding: 9px;
-}
-
-.sidebar .sidebar-bottom {
-  flex-shrink: 0;
-}
-
-@media (max-width: 1150px) {
-  .sidebar {
-    width: 286px;
+  .editor-layout .main-workspace {
+    padding-inline: 18px;
   }
 }
 
-@media (max-width: 900px) {
-  .sidebar {
-    width: min(340px, calc(100vw - 24px));
+@media (max-width: 640px) {
+  .organizer-page {
+    padding: 18px 12px 30px;
+  }
+
+  .organizer-owner-panel {
+    min-height: 0;
+    margin-bottom: 23px;
+    padding: 16px;
+    border-width: 3px;
+    border-radius: 23px;
+  }
+
+  .organizer-owner-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .organizer-owner-actions button {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .organizer-showcase__heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 19px;
+  }
+
+  .organizer-showcase__heading h1 {
+    font-size: 21px;
+  }
+
+  .organizer-template-button {
+    align-self: flex-start;
+  }
+
+  .organizer-showcase .tigao-organizer__create-panel {
+    padding: 14px;
+  }
+
+  .organizer-showcase .tigao-organizer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .organizer-showcase .tigao-organizer__card {
+    min-height: 164px;
+  }
+
+  .organizer-page-note {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .organizer-page-note .queue-hint {
+    width: 100%;
+    margin-left: 26px;
+  }
+
+  .editor-layout .workspace-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .editor-layout .project-title {
+    flex-basis: calc(100% - 135px);
+  }
+
+  .editor-layout .project-tools {
+    margin-left: auto;
+  }
+
+  .editor-back-button {
+    font-size: 10px;
   }
 }
 
@@ -152,5 +578,32 @@
 
   .topbar-right .account-select {
     max-width: 88px;
+  }
+
+  .organizer-owner-panel {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .organizer-owner-copy {
+    flex: 1;
+  }
+
+  .organizer-owner-actions {
+    width: 100%;
+    margin-left: 52px;
+  }
+
+  .organizer-showcase .tigao-organizer__card-actions {
+    gap: 1px;
+    padding-inline: 8px;
+  }
+
+  .organizer-showcase .tigao-organizer__icon-button {
+    width: 29px;
+  }
+
+  .organizer-language-badge {
+    padding-inline: 7px;
   }
 }

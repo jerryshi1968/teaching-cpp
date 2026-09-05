@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Braces, ChevronDown, ChevronRight, Code2, Copy, Download, ExternalLink, FileCode2, Folder, FolderPlus, GraduationCap, LogIn, Menu, MoreHorizontal, Play, RefreshCw, Save, Settings2, Sparkles, Square, Trash2, Users, X, Check, AlertTriangle, Clock3, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { Braces, ChevronDown, ChevronRight, Code2, Copy, Download, ExternalLink, FileCode2, Folder, FolderPlus, GraduationCap, LogIn, MoreHorizontal, Play, RefreshCw, Save, Settings2, Sparkles, Square, Trash2, Users, X, Check, AlertTriangle, Clock3, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
 import { ProjectOrganizer } from '@tigao/organizer-react';
 import { ACTIVE_STATES, STATE_LABELS } from '../../shared/contracts.mjs';
 import { api, configureApi, downloadCode, readLocal, storeLocal } from './api.mjs';
@@ -27,6 +27,7 @@ export default function App() {
   const [workspace, setWorkspace] = useState(emptyWorkspace);
   const [targetStudent, setTargetStudent] = useState(null);
   const [page, setPage] = useState('workspace');
+  const [workspaceView, setWorkspaceView] = useState('organizer');
   const [project, setProject] = useState(null);
   const [loadingProject, setLoadingProject] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -44,7 +45,6 @@ export default function App() {
   const [students, setStudents] = useState([]);
   const [classId, setClassId] = useState('');
   const [folderId, setFolderId] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(() => readLocal('cpp:font-size', 15));
@@ -114,7 +114,7 @@ export default function App() {
       const local = readLocal(draftKey(projectId));
       if (!data.readOnly && local && !sameSource(local, data)) setDraft(local);
       storeLocal(`cpp:last-project:${userRef.current.id}`, projectId);
-      setSidebarOpen(false);
+      setWorkspaceView('editor');
     } catch (error) { toast(error.message, 'error'); }
     finally { if (serial === loadSerial.current) setLoadingProject(false); }
   }, [draftKey, toast]);
@@ -133,10 +133,9 @@ export default function App() {
         projectRef.current = next; setProject(next);
       } else if (options.method === 'DELETE' && path === `/projects/${encodeURIComponent(current.id)}`) {
         projectRef.current = null; savedRef.current = null; setProject(null); setRun(null); setRuns([]); setDirty(false);
-        if (data.projects[0]) await openProject(data.projects[0].id);
       }
     } catch (error) { toast(error.message, 'error'); }
-  }, [draftKey, openProject, refreshWorkspace, toast]);
+  }, [draftKey, refreshWorkspace, toast]);
   const organizerRequest = useCallback(async (path, options = {}) => {
     const result = await api(path, options);
     if (options.method && /^\/(?:projects|groups)(?:\/|$)/.test(path)) void refreshAfterOrganizerMutation(path, options);
@@ -149,13 +148,9 @@ export default function App() {
     if (!user) return;
     let alive = true;
     ++loadSerial.current; projectRef.current = null; savedRef.current = null; setProject(null); setWorkspace(emptyWorkspace);
+    setWorkspaceView('organizer');
     setRun(null); setActiveRun(null); setRuns([]); setDirty(false); setDraft(null); setConflict(false);
-    refreshWorkspace().then(data => {
-      if (!alive || !data) return;
-      const last = readLocal(`cpp:last-project:${user.id}`);
-      const candidate = data.projects.find(item => item.id === last) || data.projects[0];
-      if (candidate) openProject(candidate.id);
-    }).catch(error => toast(error.message, 'error'));
+    refreshWorkspace().catch(error => toast(error.message, 'error'));
     if (['teacher', 'admin'].includes(user.role)) api('/classes').then(data => { if (alive) { setClasses(data); setClassId(value => value || String(data[0]?.id || '')); } }).catch(error => toast(error.message, 'error'));
     return () => { alive = false; };
   }, [user?.id, user?.role, targetStudent]);
@@ -319,9 +314,8 @@ export default function App() {
 
   return <div className="app-shell">
     <header className="topbar">
-      <button className="icon-button mobile-menu" aria-label="打开项目列表" onClick={() => setSidebarOpen(!sidebarOpen)}><Menu size={20} /></button>
       <a href="/teaching-cpp/" className="brand"><span className="brand-mark"><Braces size={24} /></span><span><strong>C++ 创意编程乐园</strong></span></a>
-      <nav aria-label="主导航"><button className={page === 'workspace' ? 'nav-active' : ''} onClick={() => setPage('workspace')}><Code2 size={16} />练习工作台</button>{isTeacher && <button className={page === 'classroom' ? 'nav-active' : ''} onClick={() => setPage('classroom')}><GraduationCap size={17} />我的课堂</button>}</nav>
+      <nav aria-label="主导航"><button className={page === 'workspace' ? 'nav-active' : ''} onClick={() => { setPage('workspace'); setWorkspaceView('organizer'); }}><Code2 size={16} />作品工坊</button>{isTeacher && <button className={page === 'classroom' ? 'nav-active' : ''} onClick={() => setPage('classroom')}><GraduationCap size={17} />我的课堂</button>}</nav>
       <div className="topbar-right"><a className="platform-link" href={config.commonDashboard} target="_blank" rel="noopener noreferrer">p5.js 平台<ExternalLink size={13} /></a><span className="avatar">{user.username.slice(0, 1)}</span>{config.mode === 'demo' ? <select className="account-select" aria-label="演示身份" value={demoUser} onChange={event => { const value = Number(event.target.value); storeLocal('cpp:demo-user', value); setTargetStudent(null); setFolderId(null); setDemoUser(value); }}><option value="1">林老师 · 演示</option><option value="2">小林同学 · 演示</option><option value="3">小陈同学 · 演示</option></select> : <span className="user-name">{user.username}<small>{isTeacher ? '教师' : '学生'}</small></span>}</div>
     </header>
     {config.mode === 'demo' && <div className="environment-banner"><span className="demo-dot" />本机演示 · 使用示例账号和临时数据，可体验编辑与教学流程；尚未连接真实编译服务，重启后演示数据重置。</div>}
@@ -329,17 +323,27 @@ export default function App() {
     {sessionError && <div className="warning-banner">{sessionError}<button onClick={refreshSession}>重新验证</button></div>}
     {notice && <div className={`toast ${notice.type}`} role={notice.type === 'error' ? 'alert' : 'status'}>{notice.type === 'error' ? <AlertTriangle size={17} /> : <Check size={17} />}<span>{notice.message}</span><button className="icon-button" aria-label="关闭提示" onClick={() => setNotice(null)}><X size={16} /></button></div>}
 
-    {page === 'classroom' ? <main className="classroom-page"><div className="page-intro"><div><div className="eyebrow">TEACHING SPACE</div><h1>一起写代码，一起成长。</h1><p>查看班级学生的 C++ 练习，或回到工作台分发你的课堂模板。</p></div><a className="button" href={config.commonDashboard} target="_blank" rel="noopener noreferrer"><Users size={16} />公共班级与个人资料<ExternalLink size={14} /></a></div><div className="class-grid"><section className="class-list"><h2>我的班级 <span>{classes.length}</span></h2>{classes.length ? classes.map(item => <button className={`class-card ${String(item.id) === classId ? 'selected' : ''}`} key={item.id} onClick={() => setClassId(String(item.id))}><span className="class-icon"><GraduationCap size={23} /></span><strong>{item.name}</strong><small>班级码：{item.class_code}</small><ChevronRight size={17} /></button>) : <p className="empty-copy">暂无负责的班级。请在原平台管理班级，入班规则保持不变。</p>}</section><section className="student-panel"><div className="panel-heading"><h2>{classes.find(item => String(item.id) === classId)?.name || '班级学生'}</h2><span className="pill">{students.length} 位同学</span></div><p className="muted">教师只能查看当前归属班级中的学生代码；查看模式不会修改学生作品。</p>{students.map((student, index) => <div className="student-row" key={student.id}><span className="student-number">{String(index + 1).padStart(2, '0')}</span><span className="avatar light">{student.username.slice(0, 1)}</span><strong>{student.username}</strong><button onClick={() => { setTargetStudent(student.id); setFolderId(null); setPage('workspace'); }}>查看练习<ChevronRight size={15} /></button></div>)}{!students.length && <div className="empty-state"><Users size={36} /><h3>这里还没有学生</h3><p>学生使用原平台班级码加入后，就会出现在这里。</p></div>}</section></div></main> : <div className="workspace-layout">
-      {sidebarOpen && <button className="sidebar-backdrop" aria-label="关闭项目列表" onClick={() => setSidebarOpen(false)} />}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        {targetStudent && <button className="back-own" onClick={() => { setTargetStudent(null); setFolderId(null); }}><ArrowLeft size={14} />返回我的工作台</button>}
-        {!targetStudent && !workspace.readOnly && <button className="organizer-template-button primary" disabled={!config.writesEnabled} onClick={() => setModal({ type: 'create' })}><Sparkles size={16} />从课堂示例新建</button>}
-        <ProjectOrganizer adapter={organizerAdapter} ownerId={targetStudent} currentParentId={folderId} onCurrentParentIdChange={parentId => { setFolderId(parentId); setSidebarOpen(false); }} messages={organizerMessages} icons={organizerIcons} onError={organizerError} />
-        <div className="sidebar-bottom"><div className="learning-note"><span className="note-icon"><Sparkles size={18} /></span><strong>每一次尝试，都算进步。</strong><p>先想一想，再写代码。<br />用不同输入检验你的想法。</p></div><div className="queue-hint"><span className="status-dot" /><span>单任务执行 · 最多 20 个待处理</span></div></div>
-      </aside>
-
+    {page === 'classroom' ? <main className="classroom-page"><div className="page-intro"><div><div className="eyebrow">TEACHING SPACE</div><h1>一起写代码，一起成长。</h1><p>查看班级学生的 C++ 练习，或回到工作台分发你的课堂模板。</p></div><a className="button" href={config.commonDashboard} target="_blank" rel="noopener noreferrer"><Users size={16} />公共班级与个人资料<ExternalLink size={14} /></a></div><div className="class-grid"><section className="class-list"><h2>我的班级 <span>{classes.length}</span></h2>{classes.length ? classes.map(item => <button className={`class-card ${String(item.id) === classId ? 'selected' : ''}`} key={item.id} onClick={() => setClassId(String(item.id))}><span className="class-icon"><GraduationCap size={23} /></span><strong>{item.name}</strong><small>班级码：{item.class_code}</small><ChevronRight size={17} /></button>) : <p className="empty-copy">暂无负责的班级。请在原平台管理班级，入班规则保持不变。</p>}</section><section className="student-panel"><div className="panel-heading"><h2>{classes.find(item => String(item.id) === classId)?.name || '班级学生'}</h2><span className="pill">{students.length} 位同学</span></div><p className="muted">教师只能查看当前归属班级中的学生代码；查看模式不会修改学生作品。</p>{students.map((student, index) => <div className="student-row" key={student.id}><span className="student-number">{String(index + 1).padStart(2, '0')}</span><span className="avatar light">{student.username.slice(0, 1)}</span><strong>{student.username}</strong><button onClick={() => { setTargetStudent(student.id); setFolderId(null); setWorkspaceView('organizer'); setPage('workspace'); }}>查看练习<ChevronRight size={15} /></button></div>)}{!students.length && <div className="empty-state"><Users size={36} /><h3>这里还没有学生</h3><p>学生使用原平台班级码加入后，就会出现在这里。</p></div>}</section></div></main> : workspaceView === 'organizer' ? <main className="organizer-page">
+      <div className="organizer-page__inner">
+        <section className="organizer-owner-panel">
+          <span className="organizer-owner-icon"><Users size={22} /></span>
+          <div className="organizer-owner-copy"><span>{targetStudent ? '正在查看学生作品' : '我的 C++ 作品空间'}</span><strong>{workspace.owner?.username || user.username}</strong></div>
+          <div className="organizer-owner-actions">
+            {targetStudent ? <button className="back-own" onClick={() => { setTargetStudent(null); setFolderId(null); }}><ArrowLeft size={14} />返回我的作品</button> : isTeacher && <button onClick={() => setPage('classroom')}><GraduationCap size={15} />查看班级作品</button>}
+          </div>
+        </section>
+        <section className="organizer-showcase">
+          <div className="organizer-showcase__heading">
+            <div><div className="organizer-kicker">{targetStudent ? 'STUDENT WORKS' : 'MY CREATIVE STUDIO'}</div><h1>{targetStudent ? '学生的 C++ 作品' : '我的创意工坊'} <Sparkles size={24} /></h1><p>{targetStudent ? '可以浏览和运行学生代码，学生原作保持只读。' : '在这里收集每一次灵感，整理作品组，再进入编辑器继续创作。'}</p></div>
+            {!targetStudent && !workspace.readOnly && <button className="organizer-template-button" disabled={!config.writesEnabled} onClick={() => setModal({ type: 'create' })}><Sparkles size={17} />从课堂示例新建</button>}
+          </div>
+          <ProjectOrganizer adapter={organizerAdapter} ownerId={targetStudent} currentParentId={folderId} onCurrentParentIdChange={setFolderId} messages={organizerMessages} icons={organizerIcons} onError={organizerError} renderProjectExtraActions={() => <span className="organizer-language-badge">C++ 创作</span>} />
+          <div className="organizer-page-note"><span className="note-icon"><Sparkles size={17} /></span><span><strong>每一次尝试，都算进步。</strong> 先想一想，再写代码，用不同输入检验你的想法。</span><span className="queue-hint"><span className="status-dot" />单任务执行 · 最多 20 个待处理</span></div>
+        </section>
+      </div>
+    </main> : <div className="workspace-layout editor-layout">
       <main className="main-workspace">
-        {project ? <><div className="workspace-heading"><div className="project-title"><div className="breadcrumb">{workspace.readOnly ? '学生练习' : '我的练习'}<ChevronRight size={12} />{workspace.groups.find(group => group.id === project.parent_id)?.name || '未分组'}</div><h1>{project.name}{project.readOnly && <span className="pill readonly-pill">只读查看</span>}</h1></div><div className="project-tools"><button className="icon-button" aria-label="下载 main.cpp" title="下载 main.cpp" onClick={() => downloadCode(project.code)}><Download size={18} /></button><button className="icon-button" aria-label="复制项目" title="创建自己的副本" onClick={copyProject}><Copy size={17} /></button>{isTeacher && !project.readOnly && <button className="distribute-button" disabled={!classes.length || !config.writesEnabled} onClick={() => setModal({ type: 'distribute', item: project, requestId: crypto.randomUUID() })}><Users size={15} />分发到班级</button>}</div></div>
+        {project ? <><div className="workspace-heading"><button className="editor-back-button" onClick={() => { setFolderId(project.parent_id || null); setWorkspaceView('organizer'); }}><ArrowLeft size={15} />返回作品工坊</button><div className="project-title"><div className="breadcrumb">{workspace.readOnly ? '学生练习' : '我的练习'}<ChevronRight size={12} />{workspace.groups.find(group => group.id === project.parent_id)?.name || '未分组'}</div><h1>{project.name}{project.readOnly && <span className="pill readonly-pill">只读查看</span>}</h1></div><div className="project-tools"><button className="icon-button" aria-label="下载 main.cpp" title="下载 main.cpp" onClick={() => downloadCode(project.code)}><Download size={18} /></button><button className="icon-button" aria-label="复制项目" title="创建自己的副本" onClick={copyProject}><Copy size={17} /></button>{isTeacher && !project.readOnly && <button className="distribute-button" disabled={!classes.length || !config.writesEnabled} onClick={() => setModal({ type: 'distribute', item: project, requestId: crypto.randomUUID() })}><Users size={15} />分发到班级</button>}</div></div>
         {draft && <div className="draft-banner"><AlertTriangle size={16} /><span>发现未保存的本地草稿（{new Date(draft.savedAt).toLocaleString('zh-CN')}）</span><button onClick={() => { const mismatch = draft.version !== project.version; const restored = { ...project, ...sourceOf(draft) }; projectRef.current = restored; setProject(restored); setDirty(true); setDraft(null); setConflict(mismatch); setSaveState(mismatch ? 'error' : 'dirty'); }}>恢复草稿</button><button onClick={() => setModal({ type: 'discard-draft' })}>保留服务器版本</button></div>}
         {conflict && <div className="draft-banner"><AlertTriangle size={16} /><span>版本冲突：自动保存已暂停，请先下载本地代码，再重新载入并合并修改。</span><button onClick={() => downloadCode(project.code, 'main-local-draft.cpp')}>下载本地代码</button><button onClick={() => setModal({ type: 'reload' })}>重新载入</button></div>}
         {project.readOnly && <div className="readonly-banner"><GraduationCap size={16} />正在查看 {project.ownerName} 的代码。不能保存、运行或停止学生任务。<button onClick={copyProject}>复制到我的练习</button></div>}

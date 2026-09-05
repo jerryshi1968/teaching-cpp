@@ -14,13 +14,30 @@ test('C++ 宿主默认展示全宽作品工坊，并在作品与编辑器之间�
   assert.match(appSource, /setWorkspaceView\('editor'\)/);
   assert.match(appSource, /返回作品工坊/);
   assert.match(appSource, /onCurrentParentIdChange=\{setFolderId\}/);
-  assert.match(appSource, /renderProjectExtraActions=\{\(\) => <span className="organizer-language-badge">C\+\+ 创作<\/span>\}/);
+  assert.match(appSource, /renderProjectExtraActions=\{item => <>/);
+  assert.match(appSource, /organizer-language-badge">C\+\+ 魔法箱<\/span>/);
   assert.doesNotMatch(appSource, /<aside className=\{\x60sidebar/);
 });
 
-test('作品工坊保持桌面三列、平板两列和窄屏单列布局', () => {
-  assert.match(organizerStyles, /\.organizer-page \{[\s\S]*linear-gradient\(180deg, #e8f5ff 0%, #f1f1ff 52%, #fff0f7 100%\)/);
-  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__grid \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+test('作品页沿用 p5.js 的教师看板、标题与创建入口', () => {
+  assert.doesNotMatch(appSource, /<nav aria-label="主导航">/);
+  assert.doesNotMatch(appSource, /page === 'classroom'/);
+  assert.match(appSource, /班级学生作品督导看板/);
+  assert.match(appSource, /当前班级：/);
+  assert.match(appSource, /我（我的项目）/);
+  assert.match(appSource, /🎨 我的创意工坊/);
+  assert.match(appSource, /新建作品组/);
+  assert.match(appSource, /动手做个新作品/);
+  assert.match(appSource, /organizerAdapter\.createGroup/);
+  assert.match(appSource, /organizerAdapter\.createProject/);
+  assert.match(appSource, /organizer-distribute-button/);
+});
+
+test('作品工坊保持 p5.js 的混合卡片网格和桌面、平板、窄屏布局', () => {
+  assert.match(organizerStyles, /\.organizer-page \{[\s\S]*linear-gradient\(180deg, #e0f2fe 0%, #eef2ff 52%, #fce7f3 100%\)/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__content \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__section,\s*\.organizer-showcase \.tigao-organizer__grid \{\s*display: contents/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__create-panel \{\s*display: none/);
   assert.match(organizerStyles, /@media \(max-width: 900px\)[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(organizerStyles, /@media \(max-width: 640px\)[\s\S]*grid-template-columns: 1fr/);
   assert.match(organizerStyles, /nth-child\(5n \+ 5\)/);

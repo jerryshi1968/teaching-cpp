@@ -607,3 +607,654 @@
     padding-inline: 7px;
   }
 }
+
+.topbar.organizer-topbar {
+  height: 82px;
+  border-bottom: 4px solid #f1f5f9;
+  background: #fffffff2;
+  box-shadow: 0 4px 12px #00000008;
+  backdrop-filter: blur(12px);
+}
+
+.organizer-topbar .brand {
+  width: auto;
+}
+
+.organizer-topbar .brand-mark {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #6366f1;
+  border-radius: 16px;
+  background: #818cf8;
+  box-shadow: 0 4px 0 #4f46e5;
+}
+
+.organizer-page {
+  padding: 32px 24px 56px;
+  background: linear-gradient(180deg, #e0f2fe 0%, #eef2ff 52%, #fce7f3 100%);
+}
+
+.organizer-page__inner {
+  width: min(1152px, 100%);
+}
+
+.organizer-teacher-panel {
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 4px solid #e0e7ff;
+  border-radius: 32px;
+  background: #ffffffcc;
+  box-shadow: 0 6px 16px #00000005;
+}
+
+.organizer-teacher-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.organizer-teacher-panel__heading h2,
+.organizer-teacher-panel__heading label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #312e81;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.organizer-teacher-panel__heading h2 > svg {
+  color: #6366f1;
+}
+
+.organizer-teacher-panel__heading label {
+  color: #64748b;
+}
+
+.organizer-teacher-panel__heading select {
+  min-width: 192px;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 2px solid #e0e7ff;
+  border-radius: 16px;
+  outline: none;
+  background: #fff;
+  color: #312e81;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.organizer-teacher-panel__heading select:focus {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 4px #e0e7ff;
+}
+
+.organizer-student-picker {
+  display: grid;
+  gap: 12px;
+}
+
+.organizer-student-picker p,
+.organizer-teacher-empty {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.organizer-student-picker p strong {
+  color: inherit;
+}
+
+.organizer-student-picker > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.organizer-student-picker button {
+  min-height: 36px;
+  padding: 7px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.organizer-student-picker button:hover {
+  border-color: #a5b4fc;
+}
+
+.organizer-student-picker button.selected {
+  border-color: #6366f1;
+  background: #818cf8;
+  color: #fff;
+  box-shadow: 0 4px 8px #4338ca33;
+}
+
+.organizer-showcase__heading {
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 0 0 20px;
+  border-bottom: 2px solid #cbd5e180;
+}
+
+.organizer-showcase__heading h1 {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+
+.organizer-showcase__heading p {
+  margin-top: 6px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.organizer-create-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.organizer-create-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 850;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.organizer-create-actions button:active:not(:disabled) {
+  transform: translateY(4px);
+}
+
+.organizer-create-group {
+  border: 2px solid #c7d2fe;
+  background: #fff;
+  color: #4338ca;
+  box-shadow: 0 4px 8px #00000008;
+}
+
+.organizer-create-group:hover:not(:disabled) {
+  background: #eef2ff;
+}
+
+.organizer-create-project {
+  border: 0;
+  border-bottom: 4px solid #d97706;
+  background: #fbbf24;
+  color: #451a03;
+  box-shadow: 0 4px 8px #0000000d;
+}
+
+.organizer-create-project:hover:not(:disabled) {
+  background: #fcd34d;
+}
+
+.organizer-showcase > .tigao-organizer {
+  --organizer-color-text: #1e293b;
+  --organizer-color-muted: #94a3b8;
+  --organizer-color-surface: #fff;
+  --organizer-color-subtle: #f8fafc;
+  --organizer-color-accent: #818cf8;
+  --organizer-color-accent-soft: #eef2ff;
+  --organizer-color-border: #e2e8f0;
+  --organizer-radius: 32px;
+  --organizer-gap: 24px;
+  --organizer-shadow: 0 4px 8px #0000000d;
+}
+
+.organizer-showcase .tigao-organizer__header {
+  min-height: 0;
+  margin: 0;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumbs {
+  gap: 8px;
+  margin-bottom: 20px;
+  color: #64748b;
+  font-weight: 850;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumb {
+  min-height: 30px;
+  padding: 5px 12px;
+  background: #ffffffcc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.organizer-showcase .tigao-organizer__breadcrumb[aria-current="page"] {
+  background: #818cf8;
+  color: #fff;
+  box-shadow: none;
+}
+
+.organizer-showcase .tigao-organizer__create-panel {
+  display: none;
+}
+
+.organizer-showcase .tigao-organizer__content {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.organizer-showcase .tigao-organizer__section,
+.organizer-showcase .tigao-organizer__grid {
+  display: contents;
+}
+
+.organizer-showcase .tigao-organizer__section h2 {
+  display: none;
+}
+
+.organizer-showcase .tigao-organizer__card {
+  display: block;
+  position: relative;
+  min-height: 176px;
+  height: 176px;
+  overflow: hidden;
+  border: 4px solid #c7d2fe;
+  border-radius: 32px;
+  background: #ffffffeb;
+  box-shadow: var(--organizer-shadow);
+  transition: transform 300ms ease, box-shadow 300ms ease, opacity 150ms ease;
+}
+
+.organizer-showcase .tigao-organizer__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px #0000000f;
+}
+
+.organizer-showcase .tigao-organizer__card::after {
+  content: "★";
+  position: absolute;
+  top: -15px;
+  right: -7px;
+  color: #94a3b838;
+  font-size: 54px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.organizer-showcase .tigao-organizer__card--group {
+  border-color: #c7d2fe;
+  background: #eef2ff66;
+}
+
+.organizer-showcase .tigao-organizer__card--group::before {
+  content: "文件夹";
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 5px 12px;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.organizer-showcase .tigao-organizer__card--group::after {
+  content: "📁";
+  opacity: .22;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 1) {
+  border-color: #7dd3fc;
+  background: #f0faffeb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 2) {
+  border-color: #fcd34d;
+  background: #fffbebeb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 3) {
+  border-color: #6ee7b7;
+  background: #ecfdf5eb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 4) {
+  border-color: #fda4af;
+  background: #fff1f2eb;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 5) {
+  border-color: #d8b4fe;
+  background: #faf5ffeb;
+}
+
+.organizer-showcase .tigao-organizer__item-main {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-height: 168px;
+  padding: 20px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.organizer-showcase .tigao-organizer__item-symbol {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: #6366f1;
+}
+
+.organizer-showcase .tigao-organizer__card--project .tigao-organizer__item-symbol {
+  color: #fb923c;
+}
+
+.organizer-showcase .tigao-organizer__item-copy {
+  display: block;
+  padding: 0;
+}
+
+.organizer-showcase .tigao-organizer__item-copy strong {
+  display: block;
+  position: absolute;
+  top: 22px;
+  right: 44px;
+  left: 49px;
+  overflow: hidden;
+  padding: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organizer-showcase .tigao-organizer__card--group .tigao-organizer__item-copy strong {
+  color: #4338ca;
+}
+
+.organizer-showcase .tigao-organizer__item-copy small {
+  position: absolute;
+  bottom: 17px;
+  left: 20px;
+  max-width: calc(100% - 150px);
+  overflow: hidden;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organizer-showcase .tigao-organizer__card--project .tigao-organizer__item-copy small::before {
+  content: "更新时间：";
+}
+
+.organizer-showcase .tigao-organizer__card--group .tigao-organizer__item-copy small {
+  display: none;
+}
+
+.organizer-showcase .tigao-organizer__card--group .tigao-organizer__item-main::after {
+  content: "点击进入作品组";
+  position: absolute;
+  bottom: 17px;
+  left: 20px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.organizer-showcase .tigao-organizer__open-label {
+  display: none;
+}
+
+.organizer-showcase .tigao-organizer__nest-target {
+  position: absolute;
+  inset: 26px;
+  z-index: 5;
+  margin: 0;
+  border: 2px dashed #6ee7b7;
+  border-radius: 16px;
+  background: #ecfdf5f2;
+  color: #047857;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.organizer-showcase .tigao-organizer__nest-target--over {
+  opacity: 1;
+}
+
+.organizer-showcase .tigao-organizer__card-actions {
+  display: flex;
+  position: absolute;
+  top: 54px;
+  right: 15px;
+  left: 15px;
+  z-index: 3;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 34px;
+  gap: 1px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.organizer-showcase .tigao-organizer__icon-button {
+  width: 31px;
+  height: 31px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #94a3b8;
+}
+
+.organizer-showcase .tigao-organizer__icon-button:hover:not(:disabled) {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(1) {
+  order: 1;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(2) {
+  order: 3;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(3) {
+  order: 4;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(4) {
+  order: 6;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(5) {
+  order: 5;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(6) {
+  order: 7;
+}
+
+.organizer-showcase .organizer-distribute-button {
+  order: 2;
+}
+
+.organizer-showcase .organizer-distribute-button:hover:not(:disabled) {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+.organizer-language-badge {
+  position: absolute;
+  right: 0;
+  bottom: -75px;
+  order: 8;
+  margin: 0;
+  padding: 5px 12px;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 2) .organizer-language-badge {
+  border-color: #fde68a;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 3) .organizer-language-badge {
+  border-color: #a7f3d0;
+  background: #d1fae5;
+  color: #047857;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 4) .organizer-language-badge {
+  border-color: #fecdd3;
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.organizer-showcase .tigao-organizer__section[aria-labelledby="tigao-organizer-projects-title"] .tigao-organizer__card:nth-child(5n + 5) .organizer-language-badge {
+  border-color: #e9d5ff;
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.organizer-showcase .tigao-organizer__readonly,
+.organizer-showcase .tigao-organizer__warning,
+.organizer-showcase .tigao-organizer__alert {
+  margin-bottom: 20px;
+}
+
+.organizer-showcase .tigao-organizer__empty {
+  min-height: 300px;
+  width: min(520px, 100%);
+  margin: 0 auto;
+  border: 4px dashed #cbd5e1;
+  border-radius: 40px;
+  background: #ffffffb3;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 850;
+  box-shadow: inset 0 2px 8px #0f172a0a;
+}
+
+@media (max-width: 900px) {
+  .organizer-page {
+    padding: 28px 20px 44px;
+  }
+
+  .organizer-showcase .tigao-organizer__content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .organizer-teacher-panel__heading {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar.organizer-topbar {
+    height: 64px;
+  }
+
+  .organizer-page {
+    padding: 20px 12px 36px;
+  }
+
+  .organizer-teacher-panel {
+    margin-bottom: 24px;
+    padding: 16px;
+    border-width: 3px;
+    border-radius: 24px;
+  }
+
+  .organizer-teacher-panel__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .organizer-teacher-panel__heading label {
+    justify-content: space-between;
+  }
+
+  .organizer-teacher-panel__heading select {
+    min-width: 0;
+    width: min(220px, 70%);
+  }
+
+  .organizer-student-picker button {
+    padding-inline: 12px;
+  }
+
+  .organizer-showcase__heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .organizer-showcase__heading h1 {
+    font-size: 21px;
+  }
+
+  .organizer-create-actions button {
+    min-height: 44px;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .organizer-showcase .tigao-organizer__content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .organizer-create-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .organizer-create-actions button {
+    width: 100%;
+  }
+
+  .organizer-showcase .tigao-organizer__card-actions {
+    right: 10px;
+    left: 10px;
+  }
+
+  .organizer-showcase .tigao-organizer__icon-button {
+    width: 29px;
+  }
+}

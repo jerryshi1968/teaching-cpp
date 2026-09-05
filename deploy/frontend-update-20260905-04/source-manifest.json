@@ -1,0 +1,35 @@
+{
+  "sourceCommit": "639a19321a57adccfd770e78b505281b80612f15",
+  "files": [
+    {
+      "path": "package-lock.json",
+      "sha256": "21486d1cf59e1d949ab5e6e1782de6305056474c20eea125079251c19568bac1",
+      "bytes": 139965
+    },
+    {
+      "path": "frontend/package.json",
+      "sha256": "55bfac89a40b41995bb3866df6d39d228e963a971d4bdb39f82542d98b8a6313",
+      "bytes": 912
+    },
+    {
+      "path": "frontend/vendor/organizer/tigao-organizer-contracts-0.1.0.tgz",
+      "sha256": "12fe52ed826cef07c49bba57d7a496db16605a4ee6b667d331f11788c4fcb3e3",
+      "bytes": 5498
+    },
+    {
+      "path": "frontend/vendor/organizer/tigao-organizer-core-0.1.0.tgz",
+      "sha256": "ec1735f27f792ed989c433a34cbe4f3fb0cab909494b3a9474575c5cebd045ca",
+      "bytes": 5692
+    },
+    {
+      "path": "frontend/vendor/organizer/tigao-organizer-react-0.1.0.tgz",
+      "sha256": "f105d43f02937228a94b018b37c997039eab6fefe37dbabc5f744482bc6b7e65",
+      "bytes": 22285
+    },
+    {
+      "path": "frontend/vendor/organizer/tigao-organizer-contract-tests-0.1.0.tgz",
+      "sha256": "327a1cc924dbb58e9e635bc23eb38d8d43292d30809936b500889fdd078b68bd",
+      "bytes": 7698
+    }
+  ]
+}

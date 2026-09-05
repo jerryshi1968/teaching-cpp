@@ -168,3 +168,44 @@ test('React 集成覆盖键盘拖放和只读状态', async () => {
   assert.deepEqual(readOnly.harness.getOpenedProjects(), ['project-read-only']);
   await readOnly.unmount();
 });
+
+test('React 集成覆盖向下拖放到中间和末尾', async () => {
+  const seed = {
+    owners: [{ id: 1, username: 'current-user', readOnly: false }],
+    groups: [],
+    projects: [
+      { kind: 'project', id: 'project-root-a', name: 'First Project', parentId: null, sortOrder: 0, updatedAt: null, ownerId: 1 },
+      { kind: 'project', id: 'project-root-b', name: 'Second Project', parentId: null, sortOrder: 1, updatedAt: null, ownerId: 1 },
+      { kind: 'project', id: 'project-root-c', name: 'Third Project', parentId: null, sortOrder: 2, updatedAt: null, ownerId: 1 }
+    ]
+  };
+  const rendered = await renderOrganizer({ harness: createCppOrganizerContractHarness(seed) });
+  await waitFor(() => itemNames('project').length === 3, 'three draggable projects');
+
+  let handle = buttonByLabel('拖放排序或移动: First Project');
+  handle.focus();
+  await press(handle, 'Space', ' ');
+  await press(document, 'ArrowDown', 'ArrowDown');
+  await press(document, 'Space', ' ');
+  await waitFor(() => itemNames('project').join(',') === 'Second Project,First Project,Third Project', 'drag to middle');
+  const middleCalls = rendered.harness.getCalls().filter(([path]) => path.endsWith('/reposition'));
+  assert.deepEqual(middleCalls.map(([, options]) => options.body), [
+    { parentId: null, beforeId: 'project-root-c' }
+  ]);
+  await rendered.unmount();
+
+  const appended = await renderOrganizer({ harness: createCppOrganizerContractHarness(seed) });
+  handle = buttonByLabel('拖放排序或移动: First Project');
+  handle.focus();
+  await press(handle, 'Space', ' ');
+  await press(document, 'ArrowDown', 'ArrowDown');
+  await press(document, 'ArrowDown', 'ArrowDown');
+  await press(document, 'Space', ' ');
+  await waitFor(() => itemNames('project').join(',') === 'Second Project,Third Project,First Project', 'drag to last');
+
+  const appendCalls = appended.harness.getCalls().filter(([path]) => path.endsWith('/reposition'));
+  assert.deepEqual(appendCalls.map(([, options]) => options.body), [
+    { parentId: null, beforeId: null }
+  ]);
+  await appended.unmount();
+});

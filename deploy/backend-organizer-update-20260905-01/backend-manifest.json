@@ -1,0 +1,21 @@
+{
+  "release": "backend-organizer-update-20260905-01",
+  "sourceCommit": "b7763ad6e0753b5a442bd6940c8829eeaaebcd56",
+  "previousBackendSource": "predeploy-20260830-02",
+  "files": [
+    {
+      "path": "backend/src/app.mjs",
+      "currentSha256": "f4bcbfd5dc8f542a6d31aa79df939eb6efd69072119e78cb0171e852c49acdd3",
+      "currentBytes": 5629,
+      "sha256": "6bfc0a91ab6ef1f2c66a274bea195d043aaf83658e7fc71489d4d0bee7e0fb1f",
+      "bytes": 5851
+    },
+    {
+      "path": "backend/src/service.mjs",
+      "currentSha256": "cc7b561eae114f069493905b6a402aed919e7a26df55056a5f60b0e8d7ca59d5",
+      "currentBytes": 22492,
+      "sha256": "dd20403a09d5fb40ec4418b9d8cbf73fe9b86383e3e846a60e3e6c4a44ef6852",
+      "bytes": 25830
+    }
+  ]
+}

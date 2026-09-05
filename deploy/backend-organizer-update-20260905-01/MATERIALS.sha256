@@ -1,0 +1,5 @@
+fe5dcc1ba8cd783304454f56780ced451ce22ff8554c300b8e6f7700aaa09a5b  deploy/backend-organizer-update-20260905-01/README.md
+b2d246840007bf63be317ea7abc05c0d728c2a6e387471a86088e27cbd78f51d  deploy/backend-organizer-update-20260905-01/backend-manifest.json
+563daaf312e646352d5922d376870611e3f69a11a0856a4af3ce3516026f01f9  deploy/backend-organizer-update-20260905-01/guard.mjs
+02319003223f748b46c2ccbd7a81cb3358f0fb0264f40b8a4b9cdcd07a045fb5  deploy/backend-organizer-update-20260905-01/package.mjs
+5e451a755d1cacf7a0c2a69e41451dcfd19747652bbe989852a38fd37d6cf97b  deploy/backend-organizer-update-20260905-01/update.mjs

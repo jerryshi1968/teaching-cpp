@@ -1,0 +1,27 @@
+{
+  "release": "frontend-update-20260906-02",
+  "sourceCommit": "85143273cb613900112164885f27040e3f2913e9",
+  "previousRelease": "frontend-update-20260906-01",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "d76467644fa8a78a0d6daec1271549f0628e01be37e467c4af97329867206a5c",
+      "bytes": 730
+    },
+    {
+      "path": "assets/editor-CEb1qCln.js",
+      "sha256": "a4f87f4e7e78487ae7c68129471f58fa0292f73b035260cb75a96e5fb7fe1ebb",
+      "bytes": 533408
+    },
+    {
+      "path": "assets/index-smUevea3.css",
+      "sha256": "72079e9a955e81b735f370c73a93fdde33feddad736947090f4e61a6b320ec54",
+      "bytes": 51863
+    },
+    {
+      "path": "assets/index-B3b5MzIT.js",
+      "sha256": "158b8071f1139364099edee459be29b0a3fade5d1f108986ff12b907f9f624b5",
+      "bytes": 252711
+    }
+  ]
+}

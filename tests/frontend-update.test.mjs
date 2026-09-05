@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { activateFrontend, assertProductionConfig, CURRENT_FRONTEND_FILES, restoreFrontend, SOURCE_COMMIT, VERSION } from '../deploy/frontend-update-20260906-01/guard.mjs';
-import { verifyMaterials } from '../deploy/frontend-update-20260906-01/update.mjs';
+import { activateFrontend, assertProductionConfig, CURRENT_FRONTEND_FILES, restoreFrontend, SOURCE_COMMIT, VERSION } from '../deploy/frontend-update-20260906-02/guard.mjs';
+import { verifyMaterials } from '../deploy/frontend-update-20260906-02/update.mjs';
 
 test('新前端发布材料固定来源提交、构建文件及四个 vendor 包', () => {
   const materials = verifyMaterials();
@@ -14,10 +14,10 @@ test('新前端发布材料固定来源提交、构建文件及四个 vendor 包
   assert.equal(materials.frontend.release, VERSION);
   assert.equal(materials.frontend.sourceCommit, SOURCE_COMMIT);
   assert.deepEqual(CURRENT_FRONTEND_FILES, [
-    { path: 'index.html', sha256: '1186299b3aeb3c82f18ff5003de5cfbe2caab0b0c0f0312d72461aeeeebbcc70', bytes: 730 },
+    { path: 'index.html', sha256: 'bb4e171acdc9335bce83e93ed31d9ca5fe6cb55ef8983241915367dacb9c1eff', bytes: 730 },
     { path: 'assets/editor-CEb1qCln.js', sha256: 'a4f87f4e7e78487ae7c68129471f58fa0292f73b035260cb75a96e5fb7fe1ebb', bytes: 533408 },
-    { path: 'assets/index-C9o3SXm9.css', sha256: 'b7e5337727c2baeb7c1f3e38bbeb6a070bd398a41e8d07fb6daa171724de9839', bytes: 50605 },
-    { path: 'assets/index-BwsIe0m0.js', sha256: '91e22a210c3a60f87eb7bbf3a42369ab6206fd60810923655ed490e06f95249c', bytes: 247334 }
+    { path: 'assets/index-smUevea3.css', sha256: '72079e9a955e81b735f370c73a93fdde33feddad736947090f4e61a6b320ec54', bytes: 51863 },
+    { path: 'assets/index-DfFosam-.js', sha256: '37c52dbad7c8bf390819524509e1cb72d848b6c91a3440f95421c5df717eafc9', bytes: 252608 }
   ]);
   assert.equal(materials.frontend.files.length, 4);
   assert.equal(materials.source.files.filter(file => file.path.endsWith('.tgz')).length, 4);
@@ -52,7 +52,7 @@ test('前端目录切换保留旧版并能把失败新版换回旧版', async t 
 });
 
 test('新发布程序不包含服务重启、Apache 重载或数据库命令', async () => {
-  const source = await fs.readFile(new URL('../deploy/frontend-update-20260906-01/update.mjs', import.meta.url), 'utf8');
+  const source = await fs.readFile(new URL('../deploy/frontend-update-20260906-02/update.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /run\(['"]systemctl['"]/);
   assert.doesNotMatch(source, /run\(PM2, \[['"](?:save|start|stop|restart|reload|delete)['"]/);
   assert.doesNotMatch(source, /\b(?:mysql|mysqldump|db:migrate)\b/i);
@@ -61,7 +61,7 @@ test('新发布程序不包含服务重启、Apache 重载或数据库命令', a
 });
 
 test('Windows 本地只执行材料检查，生产预检在读取服务器前拒绝', () => {
-  const script = fileURLToPath(new URL('../deploy/frontend-update-20260906-01/update.mjs', import.meta.url));
+  const script = fileURLToPath(new URL('../deploy/frontend-update-20260906-02/update.mjs', import.meta.url));
   const checked = spawnSync(process.execPath, [script, '--check-only'], { encoding: 'utf8' });
   assert.equal(checked.status, 0, checked.stderr);
   assert.match(checked.stdout, /未读取生产配置、未连接服务、未修改文件/);

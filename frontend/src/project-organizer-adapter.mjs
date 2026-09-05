@@ -119,6 +119,7 @@ export function createCppProjectOrganizerAdapter({ request = api, openProject, w
     },
     async repositionItem({ kind, id, parentId, beforeId } = {}) {
       const item = resource(kind);
+      if (kind === 'group' && same(id, parentId)) return { repositioned: false, item: null };
       const result = await request(`/${item.path}/${encodeURIComponent(id)}/reposition`, { method: 'PUT', body: { parentId, beforeId } });
       invalidate();
       return { repositioned: result.repositioned === true, item: item.normalize(result[item.response]) };

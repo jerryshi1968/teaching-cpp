@@ -43,18 +43,25 @@ test('作品工坊保持 p5.js 的混合卡片网格和桌面、平板、窄屏�
   assert.match(organizerStyles, /nth-child\(5n \+ 5\)/);
 });
 
-test('作品与作品组卡片按钮沿用 p5.js 的图标、顺序、尺寸和状态样式', () => {
-  assert.match(appSource, /drag: props => <GripVertical size=\{18\}/);
-  assert.match(appSource, /up: props => <ArrowUp size=\{18\}/);
-  assert.match(appSource, /down: props => <ArrowDown size=\{18\}/);
-  assert.match(appSource, /rename: props => <Pencil size=\{18\}/);
-  assert.match(appSource, /move: props => <MoveRight size=\{18\}/);
-  assert.match(appSource, /delete: props => <Trash2 size=\{18\}/);
-  assert.match(appSource, /organizer-distribute-button[\s\S]*<Send size=\{18\}/);
+test('作品与作品组卡片按钮沿用 p5.js 的图标、顺序和状态并适当放大', () => {
+  assert.match(appSource, /drag: props => <GripVertical size=\{20\}/);
+  assert.match(appSource, /up: props => <ArrowUp size=\{20\}/);
+  assert.match(appSource, /down: props => <ArrowDown size=\{20\}/);
+  assert.match(appSource, /rename: props => <Pencil size=\{20\}/);
+  assert.match(appSource, /move: props => <MoveRight size=\{20\}/);
+  assert.match(appSource, /delete: props => <Trash2 size=\{20\}/);
+  assert.match(appSource, /organizer-distribute-button[\s\S]*<Send size=\{20\}/);
   assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__card-actions \{[^}]*gap: 4px;/);
-  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__icon-button \{[^}]*width: 30px;[^}]*height: 30px;[^}]*min-height: 30px;[^}]*padding: 6px;/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__icon-button \{[^}]*width: 34px;[^}]*height: 34px;[^}]*min-height: 34px;[^}]*padding: 7px;/);
   assert.match(organizerStyles, /\.tigao-organizer__icon-button:disabled \{\s*opacity: 0\.3;/);
   assert.match(organizerStyles, /\.tigao-organizer__drag-handle \{\s*touch-action: none;/);
   assert.match(organizerStyles, /:nth-child\(5\):hover:not\(:disabled\) \{\s*background: #ecfdf5;\s*color: #10b981;/);
   assert.match(organizerStyles, /:nth-child\(6\):hover:not\(:disabled\) \{\s*background: #fff1f2;\s*color: #f43f5e;/);
+  assert.match(organizerStyles, /@media \(max-width: 390px\)[\s\S]*\.tigao-organizer__icon-button \{\s*width: 34px;/);
+});
+
+test('拖放时卡片主体负责排序，独立下部区域负责移入作品组', () => {
+  assert.match(organizerStyles, /\.tigao-organizer__nest-target \{[^}]*right: 26px;[^}]*bottom: 18px;[^}]*left: 26px;[^}]*height: 48px;/);
+  assert.match(organizerStyles, /:has\(\.tigao-organizer__card--dragging\)[^\{]*\.tigao-organizer__card--group:not\(\.tigao-organizer__card--dragging\)[^\{]*\.tigao-organizer__nest-target \{\s*opacity: 0\.8;/);
+  assert.match(organizerStyles, /\.tigao-organizer__card--dragging \.tigao-organizer__nest-target \{\s*display: none;/);
 });

@@ -76,6 +76,13 @@ test('适配器原样传播包含 status、code 和 message 的 API 错误', asy
   await assert.rejects(adapter.loadDirectory({ ownerId: null, parentId: null }), error => error === apiError && error.status === 400 && error.code === 'INVALID_BEFORE' && error.message === '目标位置无效');
 });
 
+test('适配器忽略把作品组拖回自身的无效嵌套请求', async () => {
+  const calls = [];
+  const adapter = createCppProjectOrganizerAdapter({ request: async (...args) => { calls.push(args); }, openProject: () => {} });
+  assert.deepEqual(await adapter.repositionItem({ kind: 'group', id: 7, parentId: 7, beforeId: null }), { repositioned: false, item: null });
+  assert.deepEqual(calls, []);
+});
+
 test('适配器在宿主关闭写入时向共享界面公开只读状态', async () => {
   const adapter = createCppProjectOrganizerAdapter({ request: async () => ({ ...workspace, readOnly: false }), openProject: () => {}, writable: false });
   assert.equal((await adapter.loadDirectory()).readOnly, true);

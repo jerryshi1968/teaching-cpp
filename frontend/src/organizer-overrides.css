@@ -1027,6 +1027,19 @@
   line-height: 20px;
 }
 
+.organizer-showcase .tigao-organizer__item-main::before {
+  content: "";
+  position: absolute;
+  right: 20px;
+  bottom: 45px;
+  left: 20px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.organizer-showcase .tigao-organizer__card--group .tigao-organizer__item-main::before {
+  border-top-color: #e0e7ff;
+}
+
 .organizer-showcase .tigao-organizer__open-label {
   display: none;
 }
@@ -1068,7 +1081,7 @@
   z-index: 3;
   align-items: center;
   justify-content: flex-end;
-  min-height: 38px;
+  min-height: 36px;
   gap: 4px;
   padding: 0;
   border: 0;
@@ -1076,11 +1089,11 @@
 }
 
 .organizer-showcase .tigao-organizer__icon-button {
-  flex: 0 0 34px;
-  width: 34px;
-  height: 34px;
-  min-height: 34px;
-  padding: 7px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 6px;
   border: 0;
   border-radius: 12px;
   background: transparent;
@@ -1289,6 +1302,6 @@
   }
 
   .organizer-showcase .tigao-organizer__icon-button {
-    width: 34px;
+    width: 36px;
   }
 }

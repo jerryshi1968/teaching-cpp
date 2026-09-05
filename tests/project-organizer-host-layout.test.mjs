@@ -42,3 +42,19 @@ test('作品工坊保持 p5.js 的混合卡片网格和桌面、平板、窄屏�
   assert.match(organizerStyles, /@media \(max-width: 640px\)[\s\S]*grid-template-columns: 1fr/);
   assert.match(organizerStyles, /nth-child\(5n \+ 5\)/);
 });
+
+test('作品与作品组卡片按钮沿用 p5.js 的图标、顺序、尺寸和状态样式', () => {
+  assert.match(appSource, /drag: props => <GripVertical size=\{18\}/);
+  assert.match(appSource, /up: props => <ArrowUp size=\{18\}/);
+  assert.match(appSource, /down: props => <ArrowDown size=\{18\}/);
+  assert.match(appSource, /rename: props => <Pencil size=\{18\}/);
+  assert.match(appSource, /move: props => <MoveRight size=\{18\}/);
+  assert.match(appSource, /delete: props => <Trash2 size=\{18\}/);
+  assert.match(appSource, /organizer-distribute-button[\s\S]*<Send size=\{18\}/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__card-actions \{[^}]*gap: 4px;/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__icon-button \{[^}]*width: 30px;[^}]*height: 30px;[^}]*min-height: 30px;[^}]*padding: 6px;/);
+  assert.match(organizerStyles, /\.tigao-organizer__icon-button:disabled \{\s*opacity: 0\.3;/);
+  assert.match(organizerStyles, /\.tigao-organizer__drag-handle \{\s*touch-action: none;/);
+  assert.match(organizerStyles, /:nth-child\(5\):hover:not\(:disabled\) \{\s*background: #ecfdf5;\s*color: #10b981;/);
+  assert.match(organizerStyles, /:nth-child\(6\):hover:not\(:disabled\) \{\s*background: #fff1f2;\s*color: #f43f5e;/);
+});

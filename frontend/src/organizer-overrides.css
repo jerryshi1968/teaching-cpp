@@ -1058,24 +1058,37 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 34px;
-  gap: 1px;
+  gap: 4px;
   padding: 0;
   border: 0;
   background: transparent;
 }
 
 .organizer-showcase .tigao-organizer__icon-button {
-  width: 31px;
-  height: 31px;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 6px;
   border: 0;
   border-radius: 12px;
   background: transparent;
   color: #94a3b8;
+  line-height: 1;
+  transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
 }
 
 .organizer-showcase .tigao-organizer__icon-button:hover:not(:disabled) {
   background: #eef2ff;
   color: #6366f1;
+}
+
+.organizer-showcase .tigao-organizer__icon-button:disabled {
+  opacity: 0.3;
+}
+
+.organizer-showcase .tigao-organizer__drag-handle {
+  touch-action: none;
 }
 
 .organizer-showcase .tigao-organizer__card-actions > :nth-child(1) {
@@ -1098,8 +1111,18 @@
   order: 5;
 }
 
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(5):hover:not(:disabled) {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
 .organizer-showcase .tigao-organizer__card-actions > :nth-child(6) {
   order: 7;
+}
+
+.organizer-showcase .tigao-organizer__card-actions > :nth-child(6):hover:not(:disabled) {
+  background: #fff1f2;
+  color: #f43f5e;
 }
 
 .organizer-showcase .organizer-distribute-button {
@@ -1255,6 +1278,6 @@
   }
 
   .organizer-showcase .tigao-organizer__icon-button {
-    width: 29px;
+    width: 30px;
   }
 }

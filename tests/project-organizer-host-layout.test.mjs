@@ -33,13 +33,16 @@ test('作品页沿用 p5.js 的教师看板、标题与创建入口', () => {
   assert.match(appSource, /organizer-distribute-button/);
 });
 
-test('作品工坊保持 p5.js 的混合卡片网格和桌面、平板、窄屏布局', () => {
+test('作品工坊按 p5.js 分开显示作品组与作品，并保持桌面、平板、窄屏布局', () => {
   assert.match(organizerStyles, /\.organizer-page \{[\s\S]*linear-gradient\(180deg, #e0f2fe 0%, #eef2ff 52%, #fce7f3 100%\)/);
-  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__content \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
-  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__section,\s*\.organizer-showcase \.tigao-organizer__grid \{\s*display: contents/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__content \{\s*display: flex;\s*flex-direction: column;/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__section \{\s*display: flex;\s*flex-direction: column;/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__grid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__section h2 \{\s*display: block;/);
+  assert.doesNotMatch(organizerStyles, /\.organizer-showcase \.tigao-organizer__section,\s*\.organizer-showcase \.tigao-organizer__grid \{\s*display: contents/);
   assert.match(organizerStyles, /\.organizer-showcase \.tigao-organizer__create-panel \{\s*display: none/);
-  assert.match(organizerStyles, /@media \(max-width: 900px\)[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(organizerStyles, /@media \(max-width: 640px\)[\s\S]*grid-template-columns: 1fr/);
+  assert.match(organizerStyles, /@media \(max-width: 900px\)[\s\S]*\.tigao-organizer__grid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(organizerStyles, /@media \(max-width: 640px\)[\s\S]*\.tigao-organizer__grid \{\s*grid-template-columns: 1fr/);
   assert.match(organizerStyles, /nth-child\(5n \+ 5\)/);
 });
 

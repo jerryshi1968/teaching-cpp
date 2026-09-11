@@ -11,7 +11,7 @@ import { DatabaseSync } from 'node:sqlite';
 const appRoot = path.resolve(import.meta.dirname, '..');
 const p5Root = process.env.P5JS_REFERENCE_ROOT || 'G:/teaching-p5js/backend';
 const availability = { skip: !fs.existsSync(p5Root) && '未提供已核对的原 p5.js 源码目录' };
-const baseline = new Map(fs.readFileSync(path.join(appRoot, 'deploy/p5js-reference-20260830.sha256'), 'utf8')
+const baseline = new Map(fs.readFileSync(path.join(appRoot, 'deploy/p5js-reference-20260911.sha256'), 'utf8')
   .trim().split(/\r?\n/).map(line => [line.slice(66), line.slice(0, 64)]));
 const cases = [
   ['projectController', 'getProjectById', { id: 'cpp' }, {}, 404],

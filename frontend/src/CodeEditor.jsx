@@ -2,8 +2,10 @@ import React, { useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
 import { EditorView, keymap } from '@codemirror/view';
+import { useLanguage } from './i18n/LanguageContext.jsx';
 
 export default function CodeEditor({ value, onChange, readOnly = false, fontSize = 15, onSave, onRun, editorRef, onCursor }) {
+  const { t } = useLanguage();
   const extensions = useMemo(() => [cpp(), EditorView.lineWrapping, EditorView.theme({
     '&': { height: '100%', backgroundColor: '#17232c', color: '#e2e9ee', fontSize: `${fontSize}px` },
     '.cm-scroller': { fontFamily: '"Cascadia Code", Consolas, "SFMono-Regular", monospace', lineHeight: '1.8', overflow: 'auto' },
@@ -21,5 +23,5 @@ export default function CodeEditor({ value, onChange, readOnly = false, fontSize
     basicSetup={{ lineNumbers: true, highlightActiveLine: true, bracketMatching: true, closeBrackets: true, foldGutter: true, autocompletion: false, tabSize: 4 }}
     onCreateEditor={view => { if (editorRef) editorRef.current = view; }}
     onChange={onChange} onUpdate={update => { if (update.selectionSet && onCursor) { const head = update.state.selection.main.head; const line = update.state.doc.lineAt(head); onCursor({ line: line.number, column: head - line.from + 1 }); } }}
-    aria-label={readOnly ? 'C++ 代码，只读' : 'C++ 代码编辑器'} />;
+    aria-label={readOnly ? t('editor.ariaReadOnly') : t('editor.aria')} />;
 }

@@ -1,11 +1,13 @@
 let mode = 'production';
 let demoUser = 1;
+let language = 'zh';
 export function configureApi(config, userId = 1) { mode = config.mode; demoUser = userId; }
+export function configureApiLanguage(value) { language = value === 'en' ? 'en' : 'zh'; }
 export class ApiError extends Error {
   constructor(status, data) { super(data.message || '请求失败'); this.status = status; Object.assign(this, data); }
 }
 export async function api(path, options = {}) {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = { 'Content-Type': 'application/json', 'Accept-Language': language === 'en' ? 'en' : 'zh-CN' };
   if (mode === 'demo') headers['X-Demo-User'] = String(demoUser);
   else {
     let token;
@@ -19,7 +21,7 @@ export async function api(path, options = {}) {
     if (error.name === 'AbortError') throw error;
     throw new ApiError(0, { code: 'NETWORK_ERROR', message: '连接中断，尚未确认本次操作结果。请保留本地草稿后重试' });
   }
-  const data = await response.json().catch(() => ({ message: '服务器返回了无法识别的响应' }));
+  const data = await response.json().catch(() => ({ code: 'INVALID_RESPONSE', message: '服务器返回了无法识别的响应' }));
   if (!response.ok) throw new ApiError(response.status, data);
   return data;
 }

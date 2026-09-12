@@ -184,7 +184,7 @@ const catalogs = {
     'organizer.dropInside': '放入此作品组',
     'organizer.loading': '正在召唤作品集，请稍候…',
     'organizer.loadingTargets': '正在读取目标位置…',
-    'organizer.empty': '你的画板还是空空的哦！',
+    'organizer.empty': '你的作品还是空空的哦！',
     'organizer.readOnly': '当前是只读查看，不能修改作品。',
     'organizer.saving': '正在保存变更…',
     'organizer.retry': '重新读取',

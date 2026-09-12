@@ -6,6 +6,7 @@ import { api, configureApi, configureApiLanguage, downloadCode, readLocal, store
 import CodeEditor from './CodeEditor.jsx';
 import Modal from './Modal.jsx';
 import { createLatestRequestCommitter } from './latest-request.mjs';
+import { chooseOrganizerClassId, chooseOrganizerStudentId, normalizeOrganizerId, readOrganizerFolderId, readOrganizerSelection, saveOrganizerClassId, saveOrganizerFolderId, saveOrganizerStudentId } from './organizer-state.mjs';
 import { createCppProjectOrganizerAdapter } from './project-organizer-adapter.mjs';
 import { getExampleCopy, getOrganizerMessages, getProfileName, getStateLabel, localizeServerMessage } from './i18n.mjs';
 import { useLanguage } from './i18n/LanguageContext.jsx';
@@ -46,6 +47,7 @@ export default function App() {
   const [students, setStudents] = useState([]);
   const [classId, setClassId] = useState('');
   const [folderId, setFolderId] = useState(null);
+  const [organizerSelectionReady, setOrganizerSelectionReady] = useState(false);
   const [organizerRevision, setOrganizerRevision] = useState(0);
   const [aiOpen, setAiOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -73,7 +75,9 @@ export default function App() {
       configureApi(cfg, demoUser);
       setConfig(cfg);
       const current = await api('/me');
+      const userChanged = String(userRef.current?.id ?? '') !== String(current.id);
       userRef.current = current;
+      if (userChanged) { setOrganizerSelectionReady(false); setTargetStudent(null); setFolderId(readOrganizerFolderId(current.id, null) ?? null); setClassId(''); }
       setUser(current);
       setSessionError(null);
     } catch (error) {
@@ -145,25 +149,70 @@ export default function App() {
     return result;
   }, [refreshAfterOrganizerMutation]);
   const organizerAdapter = useMemo(() => createCppProjectOrganizerAdapter({ request: organizerRequest, openProject, writable: Boolean(config?.writesEnabled) }), [config?.writesEnabled, openProject, organizerRequest]);
-  const organizerError = useCallback(error => toast(errorMessage(error), 'error'), [errorMessage, toast]);
+  const organizerError = useCallback(error => { if (folderId !== null && (error?.status === 404 || error?.code === 'INVALID_GROUP_TREE')) setFolderId(null); toast(errorMessage(error), 'error'); }, [errorMessage, folderId, toast]);
+  const selectProjectOwner = useCallback(studentId => {
+    if (!user) return;
+    const nextStudent = normalizeOrganizerId(studentId);
+    saveOrganizerFolderId(user.id, targetStudent, folderId);
+    saveOrganizerStudentId(user.id, nextStudent);
+    setTargetStudent(nextStudent);
+    setFolderId(readOrganizerFolderId(user.id, nextStudent) ?? null);
+  }, [folderId, targetStudent, user?.id]);
+  const changeClass = useCallback(nextClassId => {
+    if (!user) return;
+    saveOrganizerFolderId(user.id, targetStudent, folderId);
+    saveOrganizerClassId(user.id, nextClassId);
+    saveOrganizerStudentId(user.id, null);
+    setOrganizerSelectionReady(false); setClassId(nextClassId); setTargetStudent(null); setFolderId(readOrganizerFolderId(user.id, null) ?? null);
+  }, [folderId, targetStudent, user?.id]);
 
   useEffect(() => {
     if (!user) return;
-    let alive = true;
     ++loadSerial.current; projectRef.current = null; savedRef.current = null; setProject(null); setWorkspace(emptyWorkspace);
     setWorkspaceView('organizer');
     setRun(null); setActiveRun(null); setRuns([]); setDirty(false); setDraft(null); setConflict(false);
     refreshWorkspace().catch(error => toast(errorMessage(error), 'error'));
-    if (['teacher', 'admin'].includes(user.role)) api('/classes').then(data => { if (alive) { setClasses(data); setClassId(value => value || String(data[0]?.id || '')); } }).catch(error => toast(errorMessage(error), 'error'));
-    return () => { alive = false; };
   }, [user?.id, user?.role, targetStudent, errorMessage]);
 
   useEffect(() => {
+    if (!user) return;
+    if (!['teacher', 'admin'].includes(user.role)) {
+      setClasses([]); setClassId(''); setStudents([]); setTargetStudent(null); setFolderId(readOrganizerFolderId(user.id, null) ?? null); setOrganizerSelectionReady(true);
+      return;
+    }
+    let alive = true; setOrganizerSelectionReady(false);
+    api('/classes').then(data => {
+      if (!alive) return;
+      const saved = readOrganizerSelection(user.id);
+      const nextClassId = chooseOrganizerClassId(data, saved.classId);
+      setClasses(data); setClassId(nextClassId === null ? '' : String(nextClassId)); saveOrganizerClassId(user.id, nextClassId);
+      if (!nextClassId) { setStudents([]); saveOrganizerStudentId(user.id, null); setTargetStudent(null); setFolderId(readOrganizerFolderId(user.id, null) ?? null); setOrganizerSelectionReady(true); }
+    }).catch(error => {
+      if (!alive) return;
+      setClasses([]); setClassId(''); setStudents([]); setTargetStudent(null); setFolderId(readOrganizerFolderId(user.id, null) ?? null); setOrganizerSelectionReady(true); toast(errorMessage(error), 'error');
+    });
+    return () => { alive = false; };
+  }, [user?.id, user?.role, errorMessage, toast]);
+
+  useEffect(() => {
     if (!classId || !user || !['teacher', 'admin'].includes(user.role)) { setStudents([]); return; }
-    let alive = true; setStudents([]);
-    api(`/classes/${classId}/students`).then(data => { if (alive) setStudents(data); }).catch(error => toast(errorMessage(error), 'error'));
+    let alive = true; setStudents([]); setOrganizerSelectionReady(false);
+    api(`/classes/${classId}/students`).then(data => {
+      if (!alive) return;
+      const savedStudentId = readOrganizerSelection(user.id).studentId;
+      const nextStudent = chooseOrganizerStudentId(data, savedStudentId);
+      setStudents(data); saveOrganizerStudentId(user.id, nextStudent); setTargetStudent(nextStudent); setFolderId(readOrganizerFolderId(user.id, nextStudent) ?? null); setOrganizerSelectionReady(true);
+    }).catch(error => {
+      if (!alive) return;
+      setStudents([]); setTargetStudent(null); setFolderId(readOrganizerFolderId(user.id, null) ?? null); setOrganizerSelectionReady(true); toast(errorMessage(error), 'error');
+    });
     return () => { alive = false; };
   }, [classId, user?.id, user?.role, errorMessage, toast]);
+
+  useEffect(() => {
+    if (!organizerSelectionReady || !user) return;
+    saveOrganizerFolderId(user.id, targetStudent, folderId);
+  }, [folderId, organizerSelectionReady, targetStudent, user?.id]);
 
   const edit = useCallback(changes => {
     const current = projectRef.current;
@@ -291,7 +340,7 @@ export default function App() {
     try {
       if (!project.readOnly && dirty && !await save()) return;
       const data = await api(`/projects/${project.id}/copy`, { method: 'POST', body: {} });
-      if (targetStudent) { setTargetStudent(null); storeLocal(`cpp:last-project:${user.id}`, data.id); }
+      if (targetStudent) { selectProjectOwner(null); storeLocal(`cpp:last-project:${user.id}`, data.id); }
       else { await refreshWorkspace(); await openProject(data.id); }
       toast(t('notice.copied'), 'success');
     } catch (error) { toast(errorMessage(error), 'error'); }
@@ -317,7 +366,7 @@ export default function App() {
   return <div className="app-shell">
     <header className={`topbar${workspaceView === 'organizer' ? ' organizer-topbar' : ''}`}>
       <a href="/teaching-cpp/" className="brand"><span className="brand-mark"><Braces size={24} /></span><span><strong>{t('brand.name')}</strong></span></a>
-      <div className="topbar-right"><LanguageSelect /><a className="platform-link" href={config.commonDashboard} target="_blank" rel="noopener noreferrer">{t('platform.link')}<ExternalLink size={13} /></a><span className="avatar">{user.username.slice(0, 1)}</span>{config.mode === 'demo' ? <select className="account-select" aria-label={t('demo.identity')} value={demoUser} onChange={event => { const value = Number(event.target.value); storeLocal('cpp:demo-user', value); setTargetStudent(null); setFolderId(null); setDemoUser(value); }}><option value="1">{t('demo.teacher')}</option><option value="2">{t('demo.studentLin')}</option><option value="3">{t('demo.studentChen')}</option></select> : <span className="user-name">{user.username}<small>{isTeacher ? t('role.teacher') : t('role.student')}</small></span>}</div>
+      <div className="topbar-right"><LanguageSelect /><a className="platform-link" href={config.commonDashboard} target="_blank" rel="noopener noreferrer">{t('platform.link')}<ExternalLink size={13} /></a><span className="avatar">{user.username.slice(0, 1)}</span>{config.mode === 'demo' ? <select className="account-select" aria-label={t('demo.identity')} value={demoUser} onChange={event => { const value = Number(event.target.value); storeLocal('cpp:demo-user', value); setOrganizerSelectionReady(false); setTargetStudent(null); setFolderId(null); setDemoUser(value); }}><option value="1">{t('demo.teacher')}</option><option value="2">{t('demo.studentLin')}</option><option value="3">{t('demo.studentChen')}</option></select> : <span className="user-name">{user.username}<small>{isTeacher ? t('role.teacher') : t('role.student')}</small></span>}</div>
     </header>
     {config.mode === 'demo' && <div className="environment-banner"><span className="demo-dot" />{t('banner.demo')}</div>}
     {!config.writesEnabled && <div className="warning-banner"><AlertTriangle size={16} />{t('banner.writesDisabled')}</div>}
@@ -327,8 +376,8 @@ export default function App() {
     {workspaceView === 'organizer' ? <main className="organizer-page">
       <div className="organizer-page__inner">
         {isTeacher && <section className="organizer-teacher-panel">
-          <div className="organizer-teacher-panel__heading"><h2><User size={18} /><span>{t('teacher.board')}</span></h2><label><span>{t('teacher.class')}</span><select value={classId} disabled={!classes.length} onChange={event => { setClassId(event.target.value); setTargetStudent(null); setFolderId(null); }}>{classes.length ? classes.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : <option value="">{t('teacher.noClasses')}</option>}</select></label></div>
-          {classes.length ? <div className="organizer-student-picker"><p>{t('teacher.currentClass')}<strong>{classes.find(item => String(item.id) === classId)?.name || t('teacher.classUnselected')}</strong></p><div><button className={targetStudent == null ? 'selected' : ''} onClick={() => { setTargetStudent(null); setFolderId(null); }}>{t('teacher.me')}</button>{students.map(student => <button className={String(targetStudent) === String(student.id) ? 'selected' : ''} key={student.id} onClick={() => { setTargetStudent(student.id); setFolderId(null); }}>👤 {student.username}</button>)}</div>{!students.length && <p>{t('teacher.noStudents')}</p>}</div> : <p className="organizer-teacher-empty">{t('teacher.noBindings')}</p>}
+          <div className="organizer-teacher-panel__heading"><h2><User size={18} /><span>{t('teacher.board')}</span></h2><label><span>{t('teacher.class')}</span><select value={classId} disabled={!classes.length} onChange={event => changeClass(event.target.value)}>{classes.length ? classes.map(item => <option key={item.id} value={item.id}>{item.name}</option>) : <option value="">{t('teacher.noClasses')}</option>}</select></label></div>
+          {classes.length ? <div className="organizer-student-picker"><p>{t('teacher.currentClass')}<strong>{classes.find(item => String(item.id) === classId)?.name || t('teacher.classUnselected')}</strong></p><div><button className={targetStudent == null ? 'selected' : ''} onClick={() => selectProjectOwner(null)}>{t('teacher.me')}</button>{students.map(student => <button className={String(targetStudent) === String(student.id) ? 'selected' : ''} key={student.id} onClick={() => selectProjectOwner(student.id)}>👤 {student.username}</button>)}</div>{!students.length && <p>{t('teacher.noStudents')}</p>}</div> : <p className="organizer-teacher-empty">{t('teacher.noBindings')}</p>}
         </section>}
         <section className="organizer-showcase">
           <div className="organizer-showcase__heading">

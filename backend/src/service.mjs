@@ -106,8 +106,18 @@ export class CppService {
       return { ...project, ...content, revisionId: document.revision_id, version: document.version, ownerName: owner.username, readOnly: !same(user.id, project.user_id) };
     });
   }
+  async syncFileIndex(tx, projectId, files, time) {
+    const current = await tx.find('files', { project_id: projectId });
+    const wanted = new Map(files.map(file => [file.path, file]));
+    for (const file of current) {
+      if (!wanted.has(file.path)) await tx.remove('files', { project_id: projectId, path: file.path });
+      else await tx.update('files', { project_id: projectId, path: file.path }, { name: file.path.split('/').at(-1), updated_at: time });
+    }
+    for (const file of files) if (!current.some(existing => existing.path === file.path)) await tx.insert('files', { project_id: projectId, name: file.path.split('/').at(-1), path: file.path, created_at: time, updated_at: time });
+  }
   async makeProject(tx, userId, title, parentId, content) {
     assert((await tx.find('projects', { user_id: userId })).length < 1000, 409, 'PROJECT_QUOTA', '项目数量已达到上限 1000，请整理后再创建');
+    content = snapshot(content);
     const projectId = uuid();
     const revisionId = uuid();
     const time = now();
@@ -115,7 +125,7 @@ export class CppService {
     const siblings = await tx.find('projects', { user_id: userId, parent_id: parentId });
     const sortOrder = siblings.reduce((maximum, project) => Math.max(maximum, project.sort_order), -1) + 1;
     await tx.insert('projects', { id: projectId, user_id: userId, name: title, parent_id: parentId, sort_order: sortOrder, project_type: 'cpp', created_at: time, updated_at: time });
-    await tx.insert('files', { project_id: projectId, name: 'main.cpp', path: 'main.cpp', created_at: time, updated_at: time });
+    await this.syncFileIndex(tx, projectId, content.files, time);
     await tx.insert('documents', { project_id: projectId, revision_id: revisionId, version: 1 });
     await tx.insert('revisions', { id: revisionId, project_id: projectId, user_id: userId, source_bytes: bytes, created_at: time });
     return projectId;
@@ -125,7 +135,7 @@ export class CppService {
     const title = name(body.name);
     const example = body.exampleId ? EXAMPLES.find(item => item.id === body.exampleId) : null;
     assert(!body.exampleId || example, 400, 'EXAMPLE_NOT_FOUND', '示例不存在');
-    const content = { code: example?.code ?? DEFAULT_CODE, stdin: example?.stdin ?? '', profileId: 'cpp17' };
+    const content = { schemaVersion: 2, entrypoint: 'main.cpp', files: [{ path: 'main.cpp', content: example?.code ?? DEFAULT_CODE }], stdin: example?.stdin ?? '', profileId: 'cpp17', build: { sources: ['main.cpp'] } };
     const projectId = await this.repo.transaction(async tx => this.makeProject(tx, user.id, title, await this.parentAccess(tx, user.id, body.parentId), content));
     return this.getProject(user, projectId);
   }
@@ -145,7 +155,7 @@ export class CppService {
       await tx.insert('revisions', { id: revisionId, project_id: project.id, user_id: user.id, source_bytes: bytes, created_at: time });
       await tx.update('documents', { project_id: project.id }, { revision_id: revisionId, version: document.version + 1 });
       await tx.update('projects', { id: project.id, user_id: user.id }, { updated_at: time });
-      await tx.update('files', { project_id: project.id, path: 'main.cpp' }, { updated_at: time });
+      await this.syncFileIndex(tx, project.id, content.files, time);
       return { version: document.version + 1, revisionId, saved: true };
     };
     if (transaction) return save(transaction);
@@ -194,8 +204,8 @@ export class CppService {
       await tx.remove('projects', { id: project.id, user_id: user.id });
       return rows;
     });
-    for (const revision of revisions) await this.sources.remove(revision.id);
-    return { deleted: true };
+    const snapshotCleanupPending = !(await Promise.all(revisions.map(revision => this.sources.removeEventually(revision.id)))).every(Boolean);
+    return { deleted: true, snapshotCleanupPending };
   }
   async createGroup(user, body) {
     this.writable();
@@ -277,8 +287,9 @@ export class CppService {
       assert(recipients.length && recipients.length <= 200, 400, 'CLASS_SIZE', '班级没有学生，或超过单次分发上限 200 人');
       const document = await tx.one('documents', { project_id: source.id });
       const content = await this.sources.read(document.revision_id);
+      const distributedTitle = name([...`来自${user.username} - ${source.name}`].slice(0, 100).join(''));
       const copies = [];
-      for (const student of recipients) copies.push({ userId: student.id, projectId: await this.makeProject(tx, student.id, source.name, null, content) });
+      for (const student of recipients) copies.push({ userId: student.id, projectId: await this.makeProject(tx, student.id, distributedTitle, null, content) });
       const delivery = { id: uuid(), teacher_user_id: user.id, source_project_id: source.id, class_id: classroom.id, request_id: requestId, recipients_json: copies, created_at: now() };
       await tx.insert('distributions', delivery);
       return delivery;
@@ -287,12 +298,13 @@ export class CppService {
   async saveAndRun(user, projectId, body) {
     this.writable();
     const requestId = id(body.requestId);
+    const content = snapshot(body);
     const outcome = await this.repo.transaction(async tx => {
       await this.projectAccess(tx, user, projectId, true);
       const duplicate = await tx.one('runs', { user_id: user.id, request_id: requestId });
       if (duplicate) {
         assert(duplicate.project_id === id(projectId), 409, 'REQUEST_CONFLICT', '请求编号已用于其他项目');
-        assert(JSON.stringify(await this.sources.read(duplicate.revision_id)) === JSON.stringify(snapshot(body)), 409, 'REQUEST_CONFLICT', '同一请求编号不能用于不同代码或输入');
+        assert(JSON.stringify(await this.sources.read(duplicate.revision_id)) === JSON.stringify(content), 409, 'REQUEST_CONFLICT', '同一请求编号不能用于不同代码或输入');
         return { run: duplicate };
       }
       const pending = await tx.find('runs', { state: { $in: ACTIVE_STATES } });
@@ -304,7 +316,7 @@ export class CppService {
       const time = now();
       const row = {
         id: uuid(), user_id: user.id, project_id: id(projectId), revision_id: saved.revisionId, version: saved.version, request_id: requestId,
-        state: 'queued', profile_json: { ...PROFILES[body.profileId], image: this.config.compilerImage },
+        state: 'queued', profile_json: { ...PROFILES[content.profileId], image: this.config.compilerImage },
         compiler_output: '', stdout: '', stderr: '', message: '', elapsed_ms: null, memory_bytes: null, result_bytes: 0,
         created_at: time, updated_at: time, finished_at: null
       };
@@ -405,7 +417,8 @@ export class CppService {
       }
       return { deleted, known: new Set(revisions.map(revision => revision.id)) };
     });
-    for (const revision of removed.deleted) await this.sources.remove(revision);
+    for (const revision of removed.deleted) await this.sources.removeEventually(revision);
+    await this.sources.retryPending();
     await this.sources.removeOrphans(removed.known, this.config.retentionMs);
   }
 }

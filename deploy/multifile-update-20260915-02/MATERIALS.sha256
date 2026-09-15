@@ -1,0 +1,5 @@
+d89f8a16e7d784d541eaf8f43ba5a393acc6f3278302d57d0a7d1ede4db6be60  deploy/multifile-update-20260915-02/README.md
+257d7946f691a78fb908a1edf12ab6cf4421fb1b3a5ecf4bdf520b15d282be7b  deploy/multifile-update-20260915-02/guard.mjs
+835e486f526cccce6d0e937283188a83b5d4acc74f52e4e49833810e79ebfe9e  deploy/multifile-update-20260915-02/package.mjs
+3b40945c5ab5fd40298149c89dfcaf0b24bf7acbf28cf01c57f9a36a8302351e  deploy/multifile-update-20260915-02/release-manifest.json
+892d8005736d8c781acf7133290e201011f4f121722f470ada9892389fd0a9c5  deploy/multifile-update-20260915-02/update.mjs

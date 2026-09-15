@@ -114,7 +114,12 @@ test('旧材料摘要、原执行器与构建副本保持，辅助函数导出�
     const bytes = fs.readFileSync(new URL('../' + pin.file, import.meta.url));
     assert.equal(createHash('sha256').update(bytes).digest('hex'), pin.sha);
   }
-  for (const [file, hash] of Object.entries(verification.module.SOURCE_HASHES)) assert.equal(createHash('sha256').update(fs.readFileSync(new URL('../' + file, import.meta.url))).digest('hex'), hash);
+  const replaced = new Set(['runner/src/podman.mjs', 'backend/src/validation.mjs', 'shared/contracts.mjs']);
+  for (const [file, hash] of Object.entries(verification.module.SOURCE_HASHES)) {
+    const actual = createHash('sha256').update(fs.readFileSync(new URL('../' + file, import.meta.url))).digest('hex');
+    if (replaced.has(file)) assert.notEqual(actual, hash, file);
+    else assert.equal(actual, hash, file);
+  }
   const extra = '\nexport { loadChecks, old, imageHelpers, accountHelpers, repairHelpers, rootlessHelpers, diagnosticHelpers };\nexport function bindDiagnostic(folder, fd){record=folder;logFd=fd;}';
   const helpers = await import('data:text/javascript;base64,' + Buffer.from(verification.body + extra).toString('base64'));
   assert.equal(typeof helpers.loadChecks, 'function'); assert.equal(typeof helpers.bindDiagnostic, 'function'); assert.equal(helpers.old, undefined);

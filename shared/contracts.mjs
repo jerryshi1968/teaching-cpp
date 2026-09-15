@@ -1,6 +1,10 @@
 export const APP_BASE = '/teaching-cpp/';
 export const API_BASE = '/api/cpp';
 export const MAX_CODE_BYTES = 128 * 1024;
+export const MAX_FILE_BYTES = MAX_CODE_BYTES;
+export const MAX_PROJECT_BYTES = 512 * 1024;
+export const MAX_PROJECT_FILES = 64;
+export const MAX_SNAPSHOT_BYTES = 1024 * 1024;
 export const MAX_INPUT_BYTES = 256 * 1024;
 export const MAX_OUTPUT_BYTES = 256 * 1024;
 export const ACTIVE_STATES = ['queued', 'compiling', 'running', 'stopping'];
@@ -24,7 +28,9 @@ export const EXAMPLES = [
 ];
 export function diagnostics(text) {
   return String(text || '').split('\n').flatMap(line => {
-    const match = line.match(/(?:^|\/)main\.cpp:(\d+):(\d+):\s*(fatal error|error|warning|note):\s*(.*)/);
-    return match ? [{ line: Number(match[1]), column: Number(match[2]), severity: match[3], message: match[4] }] : [];
+    const match = line.match(/^(.*?):(\d+):(\d+):\s*(fatal error|error|warning|note):\s*(.*)/);
+    if (!match) return [];
+    const file = match[1].replace(/^\/work\//, '').replace(/\\/g, '/');
+    return [{ file, line: Number(match[2]), column: Number(match[3]), severity: match[4], message: match[5] }];
   });
 }

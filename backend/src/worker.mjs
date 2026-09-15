@@ -29,7 +29,7 @@ export class RunWorker {
             await this.service.updateRun(run.id, { state: 'system_error', message: '该任务的编译配置已更换，请重新提交；旧任务未启动' });
             return;
           }
-          result = await this.request('/jobs', 'POST', { id: run.id, code: source.code, stdin: source.stdin, profileId: source.profileId, image: run.profile_json.image });
+          result = await this.request('/jobs', 'POST', { id: run.id, ...source, image: run.profile_json.image });
         }
       }
       if (!result) throw new Error('执行服务未确认任务状态');

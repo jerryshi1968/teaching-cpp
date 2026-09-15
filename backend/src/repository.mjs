@@ -35,12 +35,14 @@ export class MemoryRepository {
   }
   async find(table, where = {}, options = {}) {
     let rows = this.tables[table].filter(row => matches(row, scoped(table, where)));
+    if (table === 'files') rows = rows.filter(row => this.tables.projects.some(project => project.id === row.project_id && project.project_type === 'cpp'));
     if (options.recent) rows = [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at) || Number(b.queue_order) - Number(a.queue_order));
     if (options.limit) rows = rows.slice(0, options.limit);
     return structuredClone(rows.map(row => table === 'runs' && !options.full ? Object.fromEntries(RUN_SUMMARY_COLUMNS.split(',').map(key => [key, row[key]])) : row));
   }
   async one(table, where) { return (await this.find(table, where, { full: true, limit: 1 }))[0] || null; }
   async insert(table, values) {
+    if (table === 'files' && !this.tables.projects.some(project => project.id === values.project_id && project.project_type === 'cpp')) throw new Error('C++ project required for file metadata');
     const key = TABLES[table][1];
     const row = structuredClone(values);
     if (table === 'runs' && row.queue_order == null) row.queue_order = Math.max(0, ...this.tables.runs.map(item => Number(item.queue_order) || 0)) + 1;
@@ -51,12 +53,12 @@ export class MemoryRepository {
   }
   async update(table, where, values) {
     let changed = 0;
-    for (const row of this.tables[table]) if (matches(row, scoped(table, where))) { Object.assign(row, structuredClone(values)); changed++; }
+    for (const row of this.tables[table]) if (matches(row, scoped(table, where)) && (table !== 'files' || this.tables.projects.some(project => project.id === row.project_id && project.project_type === 'cpp'))) { Object.assign(row, structuredClone(values)); changed++; }
     return changed;
   }
   async remove(table, where) {
     const rows = this.tables[table];
-    this.tables[table] = rows.filter(row => !matches(row, scoped(table, where)));
+    this.tables[table] = rows.filter(row => !matches(row, scoped(table, where)) || (table === 'files' && !this.tables.projects.some(project => project.id === row.project_id && project.project_type === 'cpp')));
     return rows.length - this.tables[table].length;
   }
   async transaction(fn) {
@@ -106,6 +108,7 @@ function predicate(table, where) {
     params.push(encode(key, value));
     return `${field(key)} = ?`;
   });
+  if (table === 'files') clauses.push("EXISTS (SELECT 1 FROM `projects` WHERE `projects`.`id` = `files`.`project_id` AND `projects`.`project_type` = 'cpp')");
   return { sql: clauses.length ? clauses.join(' AND ') : '1 = 1', params };
 }
 
@@ -123,6 +126,11 @@ export class MysqlRepository {
   async one(table, where) { return (await this.find(table, where, { full: true, limit: 1 }))[0] || null; }
   async insert(table, values) {
     const keys = Object.keys(values);
+    if (table === 'files') {
+      const [result] = await this.db.execute(`INSERT INTO \`files\` (${keys.map(field).join(',')}) SELECT ${keys.map(() => '?').join(',')} FROM \`projects\` WHERE \`id\` = ? AND \`project_type\` = 'cpp'`, [...keys.map(key => encode(key, values[key])), values.project_id]);
+      if (result.affectedRows !== 1) throw new Error('C++ project required for file metadata');
+      return result.insertId;
+    }
     const [result] = await this.db.execute(`INSERT INTO ${field(TABLES[table][0])} (${keys.map(field).join(',')}) VALUES (${keys.map(() => '?').join(',')})`, keys.map(key => encode(key, values[key])));
     return values[TABLES[table][1]] ?? result.insertId;
   }

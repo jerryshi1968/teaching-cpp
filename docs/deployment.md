@@ -66,7 +66,7 @@ Containerfile 使用官方镜像的 `/usr/local/bin/g++`，首版命令固定 `-
 | 编译 / 运行单进程 CPU 软上限 | 15 秒 / 3 秒，硬上限再加 1 秒                    |
 | 编译信息上限             | stdout + stderr 合计 256KiB               |
 | 程序输出上限             | stdout + stderr 合计 256KiB               |
-| 源码 / stdin         | 128KiB / 256KiB，JSON 请求和快照另有 512KiB 总限额 |
+| 项目源码 / stdin      | 最多 64 个文件；单文件 128KiB、源码总计 512KiB / stdin 256KiB；序列化快照上限 1MiB |
 | 编译产物文件上限           | 16MiB；运行时工作目录只读                         |
 | 容器临时目录             | 64MiB，noexec/nosuid/nodev               |
 | 历史源码及结果缓存          | 24 小时，每用户 100MiB，全局默认 2GiB              |
@@ -90,6 +90,8 @@ npm run db:fixture -- --confirm-empty-test-db
 npm run db:migrate
 npm run db:migrate -- --apply --confirm-db teaching_cpp_test
 ```
+
+迁移入口按顺序登记 `001_cpp` 与 `002_cpp_multifile`；后者只为 C++ revisions/runs 增加按项目清理索引，不修改共享 `files` 表结构，也不把源码正文写入数据库。
 
 `db:fixture` 拒绝非空库、非 `_test` 库和生产模式。它用于数据库合同测试，不是新建另一套注册登录系统。`db:migrate` 无 `--apply` 时只输出 SQL；显式应用时核对目标库、基础表、主键类型和字符排序规则。
 

@@ -65,6 +65,7 @@ export function verifyCgroups(text, phase = 'run') {
   const [quota, period] = (cpu || '').split(/\s+/).map(Number);
   if (Number(memory) !== expected.memory || Number(pids) !== expected.pids || !(quota > 0 && period > 0 && quota / period <= 1) || swap !== '0') throw new Error('容器资源限制未实际生效，拒绝启动执行服务');
 }
+export function compilerArguments(job) { return ['/usr/local/bin/g++', ...PROFILES[job.profileId].flags, ...job.build.sources, '-o', '.cpp-program']; }
 
 export class PodmanSandbox {
   constructor(config, runCommand = command) { this.config = config; this.command = runCommand; }
@@ -113,7 +114,7 @@ export class PodmanSandbox {
   }
   async stage(job, phase, signal) {
     const name = this.names(job.id)[phase === 'compile' ? 0 : 1];
-    const args = phase === 'compile' ? ['/usr/local/bin/g++', ...PROFILES[job.profileId].flags, '/work/main.cpp', '-o', '/work/program'] : ['/work/program'];
+    const args = phase === 'compile' ? compilerArguments(job) : ['/work/.cpp-program'];
     if (signal.aborted) return { reason: 'cancel', stdout: '', stderr: '', code: null, elapsed: 0 };
     try {
       await this.control(['create', '--interactive', ...containerOptions(this.config, name, phase, this.work(job.id)), this.imageReference(), ...args]);
@@ -134,18 +135,32 @@ export class PodmanSandbox {
     } finally { await this.removeContainer(name); }
   }
   async execute(job, signal, onPhase) {
-    snapshot(job); id(job.id);
+    job = { ...job, ...snapshot(job) }; id(job.id);
     if (job.image !== this.config.image) throw new Error('请求镜像与执行服务固定镜像不一致');
     await fs.mkdir(this.work(job.id), { recursive: false, mode: 0o700 });
     const disk = await fs.statfs(this.config.dataRoot);
     if (disk.bavail * disk.bsize < this.config.minFreeBytes) throw new Error('执行磁盘可用空间不足');
-    await fs.writeFile(path.join(this.work(job.id), 'main.cpp'), job.code, { flag: 'wx', mode: 0o600 });
+    const root = await fs.realpath(this.work(job.id));
+    for (const file of job.files) {
+      const parts = file.path.split('/');
+      let parent = root;
+      for (const part of parts.slice(0, -1)) {
+        parent = path.join(parent, part);
+        await fs.mkdir(parent, { mode: 0o700 }).catch(error => { if (error.code !== 'EEXIST') throw error; });
+        const stat = await fs.lstat(parent);
+        if (!stat.isDirectory() || stat.isSymbolicLink() || !((await fs.realpath(parent)) + path.sep).startsWith(root + path.sep)) throw new Error('项目目录包含符号链接或越界路径');
+      }
+      const target = path.join(parent, parts.at(-1));
+      await fs.writeFile(target, file.content, { flag: 'wx', mode: 0o600 });
+      const stat = await fs.lstat(target);
+      if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1 || !((await fs.realpath(target))).startsWith(root + path.sep)) throw new Error('项目文件不是安全的普通文件');
+    }
     const compiled = await this.stage(job, 'compile', signal);
     const common = { compiler_output: compiled.stdout + compiled.stderr, stdout: '', stderr: '', memory_bytes: null, elapsed_ms: null };
     const special = result => result.reason === 'cancel' ? 'cancelled' : result.reason === 'output' ? 'output_limit' : result.reason === 'time' || result.code === 152 ? 'time_limit' : result.oom ? 'memory_limit' : null;
     const compileState = special(compiled);
     if (compileState || compiled.code !== 0) return { ...common, state: compileState || (compiled.code === 125 ? 'system_error' : 'compile_error'), message: '编译阶段未完成，未执行程序' };
-    const binary = await fs.lstat(path.join(this.work(job.id), 'program'));
+    const binary = await fs.lstat(path.join(this.work(job.id), '.cpp-program'));
     if (!binary.isFile() || binary.isSymbolicLink() || binary.size > 16 * 1024 ** 2) throw new Error('编译产物无效');
     await onPhase('running');
     const result = await this.stage(job, 'run', signal);

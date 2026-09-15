@@ -18,9 +18,9 @@ test('可选 MySQL 8 测试：真实事务、版本检查、复制与隔离查�
   t.after(async () => { try { for (const project of created) await service.deleteProject(student, project.id); } finally { await repo.close(); } });
   const project = await service.createProject(student, { name: 'temporary SQL contract check' }); created.push(project);
   assert.equal(project.project_type, 'cpp');
-  const saved = await service.saveProject(student, project.id, { ...project, code: 'int main(){return 0;}' });
+  const saved = await service.saveProject(student, project.id, { ...project, files: project.files.map(file => file.path === 'main.cpp' ? { ...file, content: 'int main(){return 0;}' } : file) });
   assert.equal(saved.version, 2);
-  await assert.rejects(service.saveProject(student, project.id, { ...project, code: 'stale' }), error => error.code === 'VERSION_CONFLICT');
+  await assert.rejects(service.saveProject(student, project.id, { ...project, files: project.files.map(file => file.path === 'main.cpp' ? { ...file, content: 'stale' } : file) }), error => error.code === 'VERSION_CONFLICT');
   const copy = await service.copyProject(student, project.id, {}); created.push(copy);
-  assert.notEqual(copy.id, project.id); assert.equal(copy.code, 'int main(){return 0;}');
+  assert.notEqual(copy.id, project.id); assert.equal(copy.files.find(file => file.path === 'main.cpp').content, 'int main(){return 0;}');
 });

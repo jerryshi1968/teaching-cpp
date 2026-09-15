@@ -4,6 +4,7 @@ import App from './App.jsx';
 import { LanguageProvider, useLanguage } from './i18n/LanguageContext.jsx';
 import '@tigao/organizer-react/styles.css';
 import './styles.css';
+import './multifile.css';
 import './organizer-overrides.css';
 
 class ErrorBoundary extends React.Component {

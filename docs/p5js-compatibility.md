@@ -33,7 +33,7 @@
 
 ## 数据库迁移
 
-新增 `projects.project_type` 和 `project_groups.project_type`，非空、默认 `p5js`；原记录按默认值归类。新增联合索引，以及 C++ 专用源码索引、历史版本、运行、分发和队列锁表。共用 `files` 仅记录 `main.cpp` 元信息，真实源码存放于独立 C++ 目录。
+新增 `projects.project_type` 和 `project_groups.project_type`，非空、默认 `p5js`；原记录按默认值归类。新增联合索引，以及 C++ 专用源码索引、历史版本、运行、分发和队列锁表。共用 `files` 记录 C++ 当前项目完整文件树的元信息，所有读写均通过 `projects.project_type = 'cpp'` 限定；代码正文仍只存放于独立 C++ SourceStore 的不可变项目快照中。
 
 原 p5 项目仍以默认值兼容创建，但**旧查询不会因字段存在而自动隔离**。须先部署已审查的旧平台过滤补丁，随后才能将 C++ 的 `CPP_PRODUCTION_WRITES` 设置为 `enabled-after-p5js-review`。
 

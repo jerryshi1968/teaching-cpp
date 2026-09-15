@@ -1,0 +1,44 @@
+{
+  "release": "distribution-fix-20260915-01",
+  "sourceRevision": "781c4a5ffacbe453bfec282665691def208e7eab",
+  "sourceState": "working-tree",
+  "applicationFile": {
+    "path": "backend/src/service.mjs",
+    "currentSha256": "4a406d4d7dcbc0f9ae5387d89b3d3b601f48b1102b521f7b7a04e013990b6cb9",
+    "currentBytes": 26755,
+    "sha256": "db697623a88e87dc1a76d20c810a43da98637f23255aef6a84f54f95afba4c63",
+    "bytes": 26868
+  },
+  "frontendFiles": [
+    {
+      "path": "index.html",
+      "sha256": "cf4d93b9e10477283397b93d57c9bdc8543c002a7635f12b879d0c2b039dcc7e",
+      "bytes": 730
+    },
+    {
+      "path": "assets/editor-CEb1qCln.js",
+      "sha256": "a4f87f4e7e78487ae7c68129471f58fa0292f73b035260cb75a96e5fb7fe1ebb",
+      "bytes": 533408
+    },
+    {
+      "path": "assets/index-Cb3y0ve7.js",
+      "sha256": "e0a25b49e7ff679df871d91a5ca6aaeea194cf4034bb43e11ab9ebea84217ef2",
+      "bytes": 290250
+    },
+    {
+      "path": "assets/index-DrAvf6w2.css",
+      "sha256": "6c15a0eca073d566e14dada43bbb19db4f585609823deccdd42fb52465cdeb07",
+      "bytes": 53847
+    }
+  ],
+  "migration": {
+    "id": "002_cpp_multifile",
+    "checksum": "5525f02ab0c364e4b35902ffe671c44aba5cd7063077ccdeb3c34a483ddcf551",
+    "completedStatements": 2
+  },
+  "expectedRestarts": {
+    "cpp": 46,
+    "p5js": 68,
+    "runner": 0
+  }
+}

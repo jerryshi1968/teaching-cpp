@@ -16,13 +16,13 @@ export function createApp(service, config) {
     if (!['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname) || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.ip)) return res.status(403).json({ message: '演示模式仅供本机访问，不能公开部署' });
     next();
   });
-  app.use(express.json({ limit: '512kb', strict: true }));
+  app.use(express.json({ limit: '2mb', strict: true }));
   app.use(API_BASE, (req, res, next) => {
     if (['POST', 'PUT', 'PATCH'].includes(req.method) && (!req.body || Array.isArray(req.body))) return next(new AppError(400, 'INVALID_BODY', '请求需要 JSON 对象'));
     next();
   });
   app.get(`${API_BASE}/health`, (req, res) => res.json({ status: 'ok', mode: config.mode, executionEnabled: config.runEnabled }));
-  app.get(`${API_BASE}/config`, (req, res) => res.json({ mode: config.mode, writesEnabled: config.writesEnabled, runEnabled: config.runEnabled, profiles: Object.values(PROFILES).map(({ id, name }) => ({ id, name })), limits: { pending: 20, perUser: 1, concurrency: 1, retentionHours: 24, userCacheMB: 100 }, commonLogin: '/teaching-p5js/login', commonDashboard: '/teaching-p5js/dashboard', commonAdmin: '/teaching-p5js/admin' }));
+  app.get(`${API_BASE}/config`, (req, res) => res.json({ mode: config.mode, writesEnabled: config.writesEnabled, runEnabled: config.runEnabled, profiles: Object.values(PROFILES).map(({ id, name }) => ({ id, name })), limits: { pending: 20, perUser: 1, concurrency: 1, retentionHours: 24, userCacheMB: 100, files: 64, fileKB: 128, projectKB: 512 }, commonLogin: '/teaching-p5js/login', commonDashboard: '/teaching-p5js/dashboard', commonAdmin: '/teaching-p5js/admin' }));
   app.use(API_BASE, rateLimit({ limit: 4000, key: req => req.ip }), authentication(service, config));
   const changes = rateLimit();
   app.use(API_BASE, (req, res, next) => {

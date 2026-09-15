@@ -1,0 +1,9 @@
+.file-tabs{display:flex;align-self:stretch;min-width:0;overflow-x:auto;overflow-y:hidden}
+.file-tabs .file-tab{flex:none;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#8793a7;max-width:220px}
+.file-tabs .file-tab span{overflow:hidden;text-overflow:ellipsis}
+.file-tabs .file-tab.selected{border-bottom-color:#6385d8;color:#5472b3;background:#f7f9fd}
+.file-actions{display:flex;gap:1px;flex-shrink:0}
+.snapshot-tabs{display:flex;gap:5px;overflow-x:auto;margin-bottom:8px}
+.snapshot-tabs button{font:11px Consolas,monospace;min-height:29px;padding:5px 9px}
+.snapshot-tabs button.selected{color:#456ed0;background:#eef3ff;border-color:#b5c8ef}
+@media(max-width:900px){.editor-toolbar{flex-wrap:wrap;padding-top:4px}.file-tabs{width:100%;height:42px;order:-2}.file-tabs .file-tab{height:42px}.file-actions{order:-1}.save-indicator{margin-left:auto}}

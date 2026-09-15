@@ -11,8 +11,8 @@
 | `GET /workspace?studentId=…` | 自己的项目与组；教师可查本班学生 |
 | `GET /examples` | 首版固定练习模板元信息 |
 | `POST /projects` | `{name,parentId?,exampleId?}` 创建 |
-| `GET /projects/:id` | 当前代码、输入、配置、版本、只读权限 |
-| `PUT /projects/:id/source` | `{code,stdin,profileId,version}` 保存 |
+| `GET /projects/:id` | 当前完整文件集合、输入、构建配置、版本、只读权限 |
+| `PUT /projects/:id/source` | v2 项目快照加 `version` 保存 |
 | `PATCH /projects/:id` | `{name?,parentId?}` 重命名/移动 |
 | `PUT /projects/:id/reposition` | `{parentId,beforeId}` 在一次事务中移动作品并确定目标位置；两字段都必须显式提供且可为 `null` |
 | `DELETE /projects/:id` | 删除自己的项目；有未完成任务时拒绝 |
@@ -23,19 +23,34 @@
 | `PUT /groups/reorder` | 同类作品组排序接口 |
 | `GET /classes`、`GET /classes/:id/students` | 读取自己负责的班级和学生；不改变入班逻辑 |
 | `POST /projects/:id/distribute` | `{classId,requestId}` 给本班学生分发独立副本 |
-| `POST /projects/:id/run` | `{code,stdin,profileId,version,requestId}` 保存并提交 |
+| `POST /projects/:id/run` | v2 项目快照加 `version,requestId` 保存并提交 |
 | `GET /projects/:id/runs` | 最近最多 50 条历史摘要；不批量传输全部输出 |
 | `GET /runs/:id` | 单次输出、诊断、状态、版本及队列位置 |
-| `GET /runs/:id/source` | 当次不可变源码和输入快照 |
+| `GET /runs/:id/source` | 当次不可变完整项目快照 |
 | `POST /runs/:id/stop` | 只允许任务所有者停止；请求体 `{}` |
 
 `requestId` 是浏览器生成 UUID。运行同一请求编号和相同源码/输入重复提交会返回同一任务，改变内容则拒绝。分发同一请求编号只创建一次；不同编号表示主动新分发。
+
+项目快照格式固定为 `schemaVersion:2`，正文只保存在不可变 SourceStore 文件中；共享 `files` 表只索引当前文件树元数据：
+
+```json
+{
+  "schemaVersion": 2,
+  "entrypoint": "main.cpp",
+  "files": [{ "path": "main.cpp", "content": "int main(){}" }],
+  "stdin": "",
+  "profileId": "cpp17",
+  "build": { "sources": ["main.cpp"] }
+}
+```
+
+服务读取旧 `{code,stdin,profileId}` 快照时会在内存中规范化成仅含 `main.cpp` 的 v2 结构，新保存不再写旧格式。`build.sources` 是有序、显式且必须存在的编译单元列表；Runner 不通过目录扫描决定编译顺序。路径必须是规范的项目内 POSIX 相对路径，拒绝绝对路径、反斜线、空段、`.`、`..`、大小写冲突、重复项和文件/目录冲突。
 
 两个 `reposition` 接口中，`parentId:null` 表示根目录，`beforeId:null` 表示追加到目标目录末尾；非空 `beforeId` 必须是当前用户、C++ 类型和目标目录中的同类记录，且不能指向被移动项自身。作品接口成功返回 `{repositioned:true,project:{…}}`，作品组接口成功返回 `{repositioned:true,group:{…}}`。移动父组、循环校验和受影响目录的连续排序重写在同一个数据库事务内完成；跨目录移动会同时归一化源目录和目标目录，排序从 0 开始。旧 `PATCH` 在父组不变时不会改变位置，真正跨父组时会复用该事务逻辑并追加到目标目录末尾。
 
 版本从 1 递增。源码、stdin、profileId 均未变时保存不增加版本；输入改变也会形成新版本。版本冲突返回 409 / `VERSION_CONFLICT`，前端保留草稿、暂停自动保存，不自动覆盖。
 
-保存和运行快照登记在同一短数据库事务内完成；磁盘源码以 UUID 不可变文件先写入并同步，再提交元数据。队列满或未启用执行时仍提交保存，返回 `saved:true`、版本与明确错误。存储失败或版本冲突会回滚，不插入任务。失败事务留下的无引用临时源码，按孤立文件保留期清理。
+保存和运行快照登记在同一短数据库事务内完成；磁盘源码以 UUID 不可变文件先写入并同步，再提交元数据。队列满或未启用执行时仍提交保存，返回 `saved:true`、版本与明确错误。存储失败或版本冲突会回滚，不插入任务。失败事务留下的无引用临时源码，按孤立文件保留期清理。删除项目会在事务中清除 C++ documents/files/runs/revisions；快照删除先登记持久化 GC 标记，磁盘失败由后续清理重试。
 
 主要错误：401 未登录/身份过期；404 不存在或无权访问；409 版本冲突、已有任务、非空组、请求编号冲突；413 大小超限；429 排队满/操作频繁；503 写入关闭、身份/执行服务不可用；507 磁盘空间不足。错误文本不回传数据库详情或内部凭据。
 
@@ -43,13 +58,13 @@
 
 仅本机 `127.0.0.1:5200`，每个请求都需要独立 `RUNNER_TOKEN`。业务浏览器不持有此令牌。
 
-- `POST /jobs`：固定任务 ID、源码、stdin、profileId、镜像 ID；执行服务只有一个槽位。
+- `POST /jobs`：固定任务 ID、完整 v2 项目快照和镜像 ID；执行服务只有一个槽位。
 - `GET /jobs/:id`：查询同一任务，不触发二次执行。
 - `POST /jobs/:id/cancel`：若取消先于提交到达，持久化取消标记，阻止迟到提交启动。
 - `GET /health`：经内部令牌认证的运行服务状态。
 
 任务状态：queued → compiling → running → completed，或 compile_error/runtime_error/time_limit/memory_limit/output_limit/system_error。排队可直接取消；已派发任务先进入 stopping，容器清理确认后才 cancelled。短暂断网不被当作“已停止”，也不释放队列槽位。
 
-任务和结果记录持久化，服务重启先清理自己标签和命名规则下的旧容器，再把未结束记录标为执行异常；从不自动重跑已登记任务。C++ 代码在容器中编译和运行，编译与运行使用不同容器，第二个容器对任务目录只有读取权限。
+任务和结果记录持久化，服务重启先清理自己标签和命名规则下的旧容器，再把未结束记录标为执行异常；从不自动重跑已登记任务。Runner 在全新任务目录中逐级核验并生成完整文件树，拒绝符号链接和越界路径，严格按快照 `build.sources` 顺序编译。C++ 代码在容器中编译和运行，编译与运行使用不同容器，第二个容器对任务目录只有读取权限。
 
 所有 `stdout`、`stderr`、源码和诊断按纯文本显示，不作为 HTML 渲染。内存上限与内存峰值是不同概念；首版不返回虚构的峰值。

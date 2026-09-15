@@ -11,7 +11,7 @@ export function createRunnerApp(manager, config) {
     if (received.length !== expected.length || !timingSafeEqual(received, expected)) return res.status(401).json({ message: '执行服务认证失败' });
     next();
   });
-  app.use(express.json({ limit: '512kb', strict: true }));
+  app.use(express.json({ limit: '2mb', strict: true }));
   app.use((req, res, next) => {
     if (req.method === 'POST' && (!req.body || Array.isArray(req.body))) return res.status(400).json({ message: '请求需要 JSON 对象' });
     next();

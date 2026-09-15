@@ -18,6 +18,17 @@ test('真实 HTTP 链路保存、类别隔离、非法字段和代码长度限�
   assert.equal((await repo.find('runs')).length, 0);
 });
 
+test('HTTP API 往返完整多文件快照并拒绝危险路径', async t => {
+  const { service, config } = await fixture(t);
+  const client = request(createApp(service, config));
+  const created = (await client.post('/api/cpp/projects').set('X-Demo-User', '2').send({ name: 'Multi HTTP' }).expect(201)).body;
+  const body = { schemaVersion: 2, entrypoint: 'main.cpp', files: [{ path: 'main.cpp', content: '#include "src/a.h"\nint main(){return a();}' }, { path: 'src/a.cpp', content: '#include "a.h"\nint a(){return 0;}' }, { path: 'src/a.h', content: 'int a();' }], stdin: '', profileId: 'cpp17', build: { sources: ['main.cpp', 'src/a.cpp'] }, version: created.version };
+  await client.put(`/api/cpp/projects/${created.id}/source`).set('X-Demo-User', '2').send(body).expect(200);
+  const loaded = (await client.get(`/api/cpp/projects/${created.id}`).set('X-Demo-User', '2').expect(200)).body;
+  assert.deepEqual(loaded.files.map(file => file.path), ['main.cpp', 'src/a.cpp', 'src/a.h']);
+  await client.put(`/api/cpp/projects/${created.id}/source`).set('X-Demo-User', '2').send({ ...body, version: loaded.version, files: [{ path: '../escape.cpp', content: '' }] }).expect(400);
+});
+
 test('非演示环境不接受演示身份；公共身份核验后重新读取数据库权限', async t => {
   const fakeAuth = createServer((req, res) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ id: 2, role: 'admin' })); });
   await new Promise(resolve => fakeAuth.listen(0, '127.0.0.1', resolve));

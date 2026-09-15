@@ -17,10 +17,15 @@ function cpp(overrides = {}) {
   return { name: enable.NAME, pm_id: 1, pid: 1234, pm2_env: { pm_cwd: enable.ROOT, pm_exec_path: enable.ROOT + '/backend/src/server.mjs', exec_mode: 'fork_mode', watch: false, uid: 995, gid: 992, NODE_ENV: 'production', APP_MODE: 'production', status: 'online', restart_time: 1, ...overrides } };
 }
 
-test('新脚本和序列化检查程序可解析，所需网站代码摘要保持', () => {
+test('历史启用脚本可解析，其摘要拒绝新版多文件网站代码', () => {
   assert.equal(script[0], 35); assert.equal(text.includes('\r'), false);
   for (const mode of ['candidate', 'enabled', 'restored']) assert.doesNotThrow(() => new vm.Script(enable.probeSource(mode)));
-  for (const [file, hash] of Object.entries(enable.HASHES)) assert.equal(createHash('sha256').update(fs.readFileSync(new URL('../' + file, import.meta.url))).digest('hex'), hash, file);
+  const replaced = new Set(['backend/src/worker.mjs', 'backend/src/repository.mjs', 'backend/src/service.mjs', 'backend/src/app.mjs', 'backend/src/source-store.mjs']);
+  for (const [file, hash] of Object.entries(enable.HASHES)) {
+    const actual = createHash('sha256').update(fs.readFileSync(new URL('../' + file, import.meta.url))).digest('hex');
+    if (replaced.has(file)) assert.notEqual(actual, hash, file);
+    else assert.equal(actual, hash, file);
+  }
 });
 
 for (const newline of ['\n', '\r\n']) test('三项配置替换保留其他字节、注释、引号和 ' + JSON.stringify(newline), () => {

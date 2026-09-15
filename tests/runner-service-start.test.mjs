@@ -29,12 +29,13 @@ async function listen(t, app) {
   return server.address().port;
 }
 
-test('单文件 LF/UTF8 可解析，固定的入口和依赖摘要与已交付文件对应', () => {
+test('单文件 LF/UTF8 可解析，历史摘要不接受新版执行入口', () => {
   assert.equal(bytes[0], 35); assert.equal(text.includes('\r'), false);
   assert.doesNotThrow(() => new vm.Script(start.guardSource()));
   for (const [name, digest] of Object.entries(start.SOURCE_HASHES)) {
     const current = sha(fs.readFileSync(new URL('../' + name, import.meta.url)));
     if (name === 'package-lock.json') { assert.equal(digest, 'f21c8fc02eb2a46a00900285db742f43a001af874771cf6c6dcb992b4f92febb', name); assert.notEqual(current, digest, '历史部署包不能接受尚未重新打包的依赖锁文件'); }
+    else if (name === 'runner/src/app.mjs') assert.notEqual(current, digest, '历史部署包不能接受新版多文件任务入口');
     else assert.equal(current, digest, name);
   }
 });
